@@ -38,19 +38,13 @@ export function getSessionsBySchoolWithStudents(schoolId: string): CounselingSes
   });
 }
 
+/**
+ * @deprecated Bu fonksiyon schoolId filtresi kullanmıyor ve veri sızıntısına yol açabilir.
+ * Bunun yerine getActiveSessionsBySchoolWithStudents(schoolId) kullanın.
+ */
 export function getActiveSessionsWithStudents(): CounselingSessionWithStudents[] {
-  const sessions = repository.getActiveSessions();
-  
-  return sessions.map((session) => {
-    const parsedTags = safeParseJSON<string[]>(session.sessionTags, []);
-    if (session.sessionType === 'group') {
-      const students = repository.getStudentsBySessionId(session.id);
-      return { ...session, sessionTags: parsedTags, students };
-    } else {
-      const student = repository.getStudentBySessionId(session.id);
-      return { ...session, sessionTags: parsedTags, student };
-    }
-  });
+  console.warn('[SECURITY WARNING] getActiveSessionsWithStudents() is deprecated. Use getActiveSessionsBySchoolWithStudents(schoolId) instead.');
+  throw new Error('getActiveSessionsWithStudents() is deprecated for security reasons. Use getActiveSessionsBySchoolWithStudents(schoolId) instead.');
 }
 
 export function getActiveSessionsBySchoolWithStudents(schoolId: string): CounselingSessionWithStudents[] {

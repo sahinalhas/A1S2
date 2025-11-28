@@ -12,6 +12,7 @@ import type { Server as SocketIOServer } from 'socket.io';
 
 interface TransferState {
   transferId: string;
+  schoolId: string;
   status: 'pending' | 'running' | 'completed' | 'cancelled' | 'error';
   progress: MEBBISTransferProgress;
   errors: MEBBISTransferError[];
@@ -43,6 +44,7 @@ export class MEBBISTransferManager {
 
     const transferState: TransferState = {
       transferId,
+      schoolId: request.schoolId,
       status: 'pending',
       progress: {
         total: sessions.length,
@@ -124,7 +126,7 @@ export class MEBBISTransferManager {
           const sessionDuration = Date.now() - sessionStartTime;
 
           if (result.success) {
-            await this.markAsTransferred(session.id);
+            await this.markAsTransferred(session.id, transferState.schoolId);
             transferState.progress.completed++;
             
             logger.info(
@@ -139,7 +141,7 @@ export class MEBBISTransferManager {
             });
           } else {
             transferState.progress.failed++;
-            await this.logError(session.id, result.error || 'Bilinmeyen hata');
+            await this.logError(session.id, result.error || 'Bilinmeyen hata', transferState.schoolId);
             
             logger.warn(
               `[${i + 1}/${sessions.length}] Session ${session.id} failed: ${result.error}`,
@@ -167,7 +169,7 @@ export class MEBBISTransferManager {
           );
           
           transferState.progress.failed++;
-          await this.logError(session.id, err.message);
+          await this.logError(session.id, err.message, transferState.schoolId);
           
           const errorObj: MEBBISTransferError = {
             sessionId: session.id,
@@ -267,7 +269,10 @@ export class MEBBISTransferManager {
     return stmt.all(...params) as any[];
   }
 
-  private async markAsTransferred(sessionId: string): Promise<void> {
+  private async markAsTransferred(sessionId: string, schoolId: string): Promise<void> {
+    if (!schoolId) {
+      throw new Error('schoolId is required for markAsTransferred - security violation');
+    }
     const db = getDatabase();
     const stmt = db.prepare(`
       UPDATE counseling_sessions 
@@ -275,21 +280,24 @@ export class MEBBISTransferManager {
           mebbis_transfer_date = ?,
           mebbis_transfer_error = NULL,
           updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
+      WHERE id = ? AND schoolId = ?
     `);
-    stmt.run(new Date().toISOString(), sessionId);
+    stmt.run(new Date().toISOString(), sessionId, schoolId);
   }
 
-  private async logError(sessionId: string, error: string): Promise<void> {
+  private async logError(sessionId: string, error: string, schoolId: string): Promise<void> {
+    if (!schoolId) {
+      throw new Error('schoolId is required for logError - security violation');
+    }
     const db = getDatabase();
     const stmt = db.prepare(`
       UPDATE counseling_sessions 
       SET mebbis_transfer_error = ?,
           mebbis_retry_count = COALESCE(mebbis_retry_count, 0) + 1,
           updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
+      WHERE id = ? AND schoolId = ?
     `);
-    stmt.run(error, sessionId);
+    stmt.run(error, sessionId, schoolId);
   }
 
   async cancelTransfer(transferId: string): Promise<void> {
