@@ -53,6 +53,9 @@ export default function SchoolSettingsTab() {
     phone: "",
     email: "",
     principal: "",
+    website: "",
+    socialMedia: "",
+    viceEducationDirector: "",
   });
   const saveSettingsRef = useRef<() => Promise<void>>();
 
@@ -80,6 +83,9 @@ export default function SchoolSettingsTab() {
           phone: editingSchool.phone,
           email: editingSchool.email,
           principal: editingSchool.principal,
+          website: editingSchool.website,
+          socialMedia: editingSchool.socialMedia,
+          viceEducationDirector: editingSchool.viceEducationDirector,
         }),
       });
 
@@ -152,7 +158,17 @@ export default function SchoolSettingsTab() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(newSchool),
+        body: JSON.stringify({
+        name: newSchool.name,
+        code: newSchool.code,
+        address: newSchool.address,
+        phone: newSchool.phone,
+        email: newSchool.email,
+        principal: newSchool.principal,
+        website: newSchool.website,
+        socialMedia: newSchool.socialMedia,
+        viceEducationDirector: newSchool.viceEducationDirector,
+      }),
       });
 
       const result = await response.json();
@@ -166,6 +182,9 @@ export default function SchoolSettingsTab() {
           phone: "",
           email: "",
           principal: "",
+          website: "",
+          socialMedia: "",
+          viceEducationDirector: "",
         });
         await loadUserSchools();
       } else {
@@ -298,6 +317,45 @@ export default function SchoolSettingsTab() {
                               }
                             />
                           </div>
+                          <div className="space-y-2">
+                            <Label>Web Sitesi</Label>
+                            <Input
+                              type="url"
+                              placeholder="https://..."
+                              value={editingSchool.website || ""}
+                              onChange={(e) =>
+                                setEditingSchool({
+                                  ...editingSchool,
+                                  website: e.target.value,
+                                })
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Sosyal Medya</Label>
+                            <Input
+                              placeholder="Instagram, Facebook vb."
+                              value={editingSchool.socialMedia || ""}
+                              onChange={(e) =>
+                                setEditingSchool({
+                                  ...editingSchool,
+                                  socialMedia: e.target.value,
+                                })
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Müdür Yardımcısı</Label>
+                            <Input
+                              value={editingSchool.viceEducationDirector || ""}
+                              onChange={(e) =>
+                                setEditingSchool({
+                                  ...editingSchool,
+                                  viceEducationDirector: e.target.value,
+                                })
+                              }
+                            />
+                          </div>
                         </div>
                         <div className="flex gap-2 pt-2 border-t">
                           <Button
@@ -352,6 +410,17 @@ export default function SchoolSettingsTab() {
                             )}
                             {school.principal && (
                               <p className="text-sm text-muted-foreground">Müdür: {school.principal}</p>
+                            )}
+                            {school.viceEducationDirector && (
+                              <p className="text-sm text-muted-foreground">Müdür Yardımcısı: {school.viceEducationDirector}</p>
+                            )}
+                            {school.website && (
+                              <p className="text-sm text-muted-foreground">
+                                Web: <a href={school.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{school.website}</a>
+                              </p>
+                            )}
+                            {school.socialMedia && (
+                              <p className="text-sm text-muted-foreground">Sosyal Medya: {school.socialMedia}</p>
                             )}
                           </div>
                         </div>
@@ -465,6 +534,34 @@ export default function SchoolSettingsTab() {
                 placeholder="Müdür adını girin"
                 value={newSchool.principal || ""}
                 onChange={(e) => setNewSchool({ ...newSchool, principal: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="newSchoolWebsite">Web Sitesi</Label>
+              <Input
+                id="newSchoolWebsite"
+                type="url"
+                placeholder="https://..."
+                value={newSchool.website || ""}
+                onChange={(e) => setNewSchool({ ...newSchool, website: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="newSchoolSocialMedia">Sosyal Medya</Label>
+              <Input
+                id="newSchoolSocialMedia"
+                placeholder="Instagram, Facebook vb."
+                value={newSchool.socialMedia || ""}
+                onChange={(e) => setNewSchool({ ...newSchool, socialMedia: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="newSchoolViceDirector">Müdür Yardımcısı</Label>
+              <Input
+                id="newSchoolViceDirector"
+                placeholder="Müdür yardımcısının adını girin"
+                value={newSchool.viceEducationDirector || ""}
+                onChange={(e) => setNewSchool({ ...newSchool, viceEducationDirector: e.target.value })}
               />
             </div>
           </div>

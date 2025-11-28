@@ -15,6 +15,9 @@ export interface School {
   phone?: string;
   email?: string;
   principal?: string;
+  website?: string;
+  socialMedia?: string;
+  viceEducationDirector?: string;
   isDefault?: number;
 }
 

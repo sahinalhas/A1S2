@@ -47,7 +47,7 @@ export function getSchoolById(req: AuthenticatedRequest, res: Response): void {
 
 export function createSchool(req: AuthenticatedRequest, res: Response): void {
   try {
-    const { name, code, address, phone, email, principal } = req.body;
+    const { name, code, address, phone, email, principal, website, socialMedia, viceEducationDirector } = req.body;
     
     if (!name) {
       res.status(400).json({ success: false, message: 'School name is required' });
@@ -61,7 +61,7 @@ export function createSchool(req: AuthenticatedRequest, res: Response): void {
     }
     
     const schoolId = `school-${randomBytes(8).toString('hex')}`;
-    schoolsRepository.insertSchool(schoolId, name, code, address, phone, email, principal);
+    schoolsRepository.insertSchool(schoolId, name, code, address, phone, email, principal, website, socialMedia, viceEducationDirector);
     
     const userId = req.user?.id;
     if (userId) {
@@ -78,7 +78,7 @@ export function createSchool(req: AuthenticatedRequest, res: Response): void {
 
 export function updateSchool(req: AuthenticatedRequest, res: Response): void {
   try {
-    const { name, code, address, phone, email, principal } = req.body;
+    const { name, code, address, phone, email, principal, website, socialMedia, viceEducationDirector } = req.body;
     const schoolId = req.params.schoolId;
     
     if (!name) {
@@ -92,7 +92,7 @@ export function updateSchool(req: AuthenticatedRequest, res: Response): void {
       return;
     }
     
-    schoolsRepository.updateSchool(schoolId, name, code, address, phone, email, principal);
+    schoolsRepository.updateSchool(schoolId, name, code, address, phone, email, principal, website, socialMedia, viceEducationDirector);
     
     const updatedSchool = schoolsRepository.getSchoolById(schoolId);
     res.json({ success: true, school: updatedSchool });

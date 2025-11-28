@@ -11,6 +11,9 @@ export function createSchoolsTables(db: Database.Database): void {
       phone TEXT,
       email TEXT,
       principal TEXT,
+      website TEXT,
+      socialMedia TEXT,
+      viceEducationDirector TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );

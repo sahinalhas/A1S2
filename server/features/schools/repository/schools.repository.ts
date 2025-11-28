@@ -22,12 +22,12 @@ function ensureInitialized(): void {
       SELECT schoolId FROM user_schools WHERE userId = ?
     `),
     insertSchool: db.prepare(`
-      INSERT INTO schools (id, name, code, address, phone, email, principal)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO schools (id, name, code, address, phone, email, principal, website, socialMedia, viceEducationDirector)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `),
     updateSchool: db.prepare(`
       UPDATE schools 
-      SET name = ?, code = ?, address = ?, phone = ?, email = ?, principal = ?, updated_at = CURRENT_TIMESTAMP
+      SET name = ?, code = ?, address = ?, phone = ?, email = ?, principal = ?, website = ?, socialMedia = ?, viceEducationDirector = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `),
     deleteSchool: db.prepare('DELETE FROM schools WHERE id = ?'),
@@ -56,14 +56,14 @@ export function getSchoolByName(name: string): any {
   return statements.getSchoolByName.get(name);
 }
 
-export function insertSchool(id: string, name: string, code?: string, address?: string, phone?: string, email?: string, principal?: string): void {
+export function insertSchool(id: string, name: string, code?: string, address?: string, phone?: string, email?: string, principal?: string, website?: string, socialMedia?: string, viceEducationDirector?: string): void {
   ensureInitialized();
-  statements.insertSchool.run(id, name, code || null, address || null, phone || null, email || null, principal || null);
+  statements.insertSchool.run(id, name, code || null, address || null, phone || null, email || null, principal || null, website || null, socialMedia || null, viceEducationDirector || null);
 }
 
-export function updateSchool(id: string, name: string, code?: string, address?: string, phone?: string, email?: string, principal?: string): void {
+export function updateSchool(id: string, name: string, code?: string, address?: string, phone?: string, email?: string, principal?: string, website?: string, socialMedia?: string, viceEducationDirector?: string): void {
   ensureInitialized();
-  statements.updateSchool.run(name, code || null, address || null, phone || null, email || null, principal || null, id);
+  statements.updateSchool.run(name, code || null, address || null, phone || null, email || null, principal || null, website || null, socialMedia || null, viceEducationDirector || null, id);
 }
 
 export function deleteSchool(id: string): void {
