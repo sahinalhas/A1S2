@@ -257,7 +257,10 @@ export default function SchoolSettingsTab() {
                 <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                 <div className="space-y-2">
                   <h3 className="font-semibold text-sm text-blue-900 dark:text-blue-100">Varsayılan Okul Nedir?</h3>
-                  <p className="text-xs text-blue-800 dark:text-blue-200">Varsayılan okul, sisteme girdiğinizde otomatik olarak açılan okulunuzdur. Pano ve raporlar varsayılan okulunuzun verilerine göre hazırlanır. Dilediğiniz zaman değiştirebilirsiniz.</p>
+                  <div className="text-xs text-blue-800 dark:text-blue-200 space-y-2">
+                    <p>Varsayılan okul, sisteme giriş yaptığınızda otomatik olarak açılan ve işlemlerinizi başlangıçta yönlendiren okul bilgisidir. Sistem, her oturumda varsayılan okul üzerinden başlar.</p>
+                    <p>İhtiyaç duyduğunuzda varsayılan okulunuzu kolayca değiştirebilir ve farklı bir okul üzerinde işlem yapabilirsiniz.</p>
+                  </div>
                 </div>
               </div>
             </CardContent>
