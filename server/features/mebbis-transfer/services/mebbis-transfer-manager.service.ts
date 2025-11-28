@@ -1,6 +1,6 @@
 import { MEBBISAutomationService } from './mebbis-automation.service.js';
 import { MEBBISDataMapper } from './mebbis-data-mapper.service.js';
-import { getAllSessions } from '../../counseling-sessions/repository/counseling-sessions.repository.js';
+import { getSessionsBySchool } from '../../counseling-sessions/repository/counseling-sessions.repository.js';
 import getDatabase from '../../../lib/database.js';
 import type { 
   MEBBISTransferProgress, 
@@ -215,6 +215,10 @@ export class MEBBISTransferManager {
   }
 
   private getSessionsToTransfer(request: StartTransferRequest): any[] {
+    if (!request.schoolId) {
+      throw new Error('schoolId is required for MEBBIS transfer - security violation');
+    }
+    
     const db = getDatabase();
     
     let query = `
@@ -232,10 +236,10 @@ export class MEBBISTransferManager {
       FROM counseling_sessions cs
       INNER JOIN counseling_session_students css ON cs.id = css.sessionId
       INNER JOIN students s ON css.studentId = s.id
-      WHERE cs.completed = 1
+      WHERE cs.completed = 1 AND cs.schoolId = ?
     `;
 
-    const params: any[] = [];
+    const params: any[] = [request.schoolId];
 
     if (request.sessionIds && request.sessionIds.length > 0) {
       const placeholders = request.sessionIds.map(() => '?').join(',');

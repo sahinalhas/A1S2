@@ -1,18 +1,23 @@
-import { validateSchoolAccess } from '../../../middleware/school-access.middleware.js';
-import { Router } from 'express';
+import { validateSchoolAccess, type SchoolScopedRequest } from '../../../middleware/school-access.middleware.js';
+import { Router, type Request } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { mebbisTransferManager } from '../services/mebbis-transfer-manager.service.js';
 import type { StartTransferRequest } from '@shared/types/mebbis-transfer.types';
 import { logger } from '../../../utils/logger.js';
 import { readFileSync, existsSync } from 'fs';
-import { validateSchoolAccess } from '../../../middleware/school-access.middleware.js';
 
 const router = Router();
 router.use(validateSchoolAccess);
 
 router.post('/start-transfer', async (req, res) => {
   try {
-    const request = req.body as StartTransferRequest;
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
+    const bodyRequest = req.body as Omit<StartTransferRequest, 'schoolId'>;
+    
+    const request: StartTransferRequest = {
+      ...bodyRequest,
+      schoolId
+    };
     
     if (!request.sessionIds || request.sessionIds.length === 0) {
       return res.status(400).json({
@@ -23,7 +28,7 @@ router.post('/start-transfer', async (req, res) => {
 
     const transferId = uuidv4();
     
-    logger.info(`Starting MEBBIS transfer ${transferId} for ${request.sessionIds.length} sessions`, 'MEBBISRoutes');
+    logger.info(`Starting MEBBIS transfer ${transferId} for ${request.sessionIds.length} sessions (school: ${schoolId})`, 'MEBBISRoutes');
     
     mebbisTransferManager.startTransfer(transferId, request);
     

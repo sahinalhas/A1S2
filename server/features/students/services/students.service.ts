@@ -273,29 +273,11 @@ export function removeStudent(id: string, schoolId: string, confirmationName?: s
 }
 
 /**
- * @deprecated Eski versiyon - schoolId kontrolü yapmıyor.
+ * @deprecated Bu fonksiyon GÜVENLİK AÇIĞI oluşturuyordu ve KALDIRILDI.
  * Bunun yerine removeStudent(id, schoolId, confirmationName) kullanın.
  */
-export function removeStudentLegacy(id: string, confirmationName?: string): { studentName: string } {
-  console.warn('[DEPRECATED] removeStudentLegacy() called. Use removeStudent(id, schoolId, confirmationName) instead.');
-  
-  const student = repository.getStudentById(id);
-  
-  if (!student) {
-    throw new Error("Öğrenci bulunamadı");
-  }
-  
-  if (confirmationName) {
-    const expectedName = `${student.name} ${student.surname}`.trim();
-    const sanitizedConfirmationName = (confirmationName || '').trim();
-    
-    if (sanitizedConfirmationName !== expectedName) {
-      throw new Error("Silme işlemini onaylamak için öğrencinin tam adını doğru yazmalısınız");
-    }
-  }
-  
-  repository.deleteStudent(id);
-  return { studentName: `${student.name} ${student.surname}` };
+export function removeStudentLegacy(_id: string, _confirmationName?: string): never {
+  throw new Error('[SECURITY] removeStudentLegacy() is disabled for security. Use removeStudent(id, schoolId, confirmationName) instead.');
 }
 
 export function getStudentAcademics(studentId: string): AcademicRecord[] {

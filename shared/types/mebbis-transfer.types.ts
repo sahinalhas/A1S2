@@ -39,6 +39,7 @@ export interface MEBBISTransferState {
 
 export interface StartTransferRequest {
   sessionIds: string[];
+  schoolId: string; // Zorunlu - okul izolasyonu için
   filters?: {
     startDate?: string;
     endDate?: string;

@@ -13,19 +13,14 @@ function safeParseJSON<T = unknown>(jsonString: string | null | undefined, fallb
   }
 }
 
+/**
+ * @deprecated Bu fonksiyon schoolId filtresi kullanmıyor ve veri sızıntısına yol açabilir.
+ * Bunun yerine getSessionsBySchoolWithStudents(schoolId) kullanın.
+ * Bu fonksiyon KALDIRILACAKTIR - lütfen kullanmayın!
+ */
 export function getAllSessionsWithStudents(): CounselingSessionWithStudents[] {
-  const sessions = repository.getAllSessions();
-  
-  return sessions.map((session) => {
-    const parsedTags = safeParseJSON<string[]>(session.sessionTags, []);
-    if (session.sessionType === 'group') {
-      const students = repository.getStudentsBySessionId(session.id);
-      return { ...session, sessionTags: parsedTags, students };
-    } else {
-      const student = repository.getStudentBySessionId(session.id);
-      return { ...session, sessionTags: parsedTags, student };
-    }
-  });
+  console.warn('[SECURITY WARNING] getAllSessionsWithStudents() is deprecated and insecure. Use getSessionsBySchoolWithStudents(schoolId) instead.');
+  throw new Error('getAllSessionsWithStudents() is deprecated for security reasons. Use getSessionsBySchoolWithStudents(schoolId) instead.');
 }
 
 export function getSessionsBySchoolWithStudents(schoolId: string): CounselingSessionWithStudents[] {
