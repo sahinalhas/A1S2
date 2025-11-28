@@ -1,31 +1,10 @@
 import { 
   refreshAnalyticsSnapshot, 
   getSnapshotData, 
-  snapshotToStudentAnalytics 
+  snapshotToStudentAnalytics,
+  type SnapshotData
 } from '../repository/analytics-snapshot.repository.js';
 import { getCachedData, setCachedData, cleanupExpiredCache, invalidateCache } from '../repository/cache.repository.js';
-
-// Define a type for the expected analytics data structure for better type safety
-interface AnalyticsData {
-  studentId: string;
-  riskLevel?: string;
-  academicPerformance?: number;
-  attendanceRate?: number;
-  behaviorScore?: number;
-  [key: string]: unknown;
-}
-interface AnalyticsData {
-  totalStudents: number;
-  riskDistribution: {
-    düşük: number;
-    orta: number;
-    yüksek: number;
-    kritik: number;
-  };
-  classComparisons: ClassComparison[];
-  topWarnings: EarlyWarning[];
-  studentAnalytics: StudentAnalytics[];
-}
 
 export interface StudentAnalytics {
   studentId: string;
@@ -168,7 +147,7 @@ export async function getStudentAnalytics(studentId: string): Promise<StudentAna
   return analytics;
 }
 
-function buildReportsFromSnapshots(snapshots: unknown[], cacheKey: string): ReportsOverview {
+function buildReportsFromSnapshots(snapshots: SnapshotData[], cacheKey: string): ReportsOverview {
   const studentAnalytics: StudentAnalytics[] = snapshots.map(snapshotToStudentAnalytics);
 
   const riskDistribution = {
@@ -178,7 +157,7 @@ function buildReportsFromSnapshots(snapshots: unknown[], cacheKey: string): Repo
     kritik: snapshots.filter(s => s.risk_level === 'Kritik').length
   };
 
-  const classMap = new Map<string, { students: unknown[]; totalGPA: number; totalAttendance: number }>();
+  const classMap = new Map<string, { students: SnapshotData[]; totalGPA: number; totalAttendance: number }>();
 
   for (const snapshot of snapshots) {
     const className = snapshot.class_name || 'Belirtilmemiş';
@@ -208,7 +187,6 @@ function buildReportsFromSnapshots(snapshots: unknown[], cacheKey: string): Repo
     if (snapshot.early_warnings) {
       try {
         const warnings = JSON.parse(snapshot.early_warnings);
-        // Add type validation for warnings if necessary
         allWarnings.push(...warnings);
       } catch (e) {
         console.error('Error parsing warnings:', e);

@@ -16,7 +16,7 @@ import { saveProgress } from '../features/progress/repository/progress.repositor
 import type { Progress } from '../features/progress/types/progress.types.js';
 
 import { upsertAcademicGoal } from '../features/coaching/repository/coaching.repository.js';
-import type { AcademicGoal } from '../features/coaching/types/index.js';
+import type { AcademicGoal } from '../features/coaching/types/coaching.types.js';
 
 export function migrateFromLocalStorage(localStorageData: any) {
   console.log('Starting migration from localStorage to SQLite...');
