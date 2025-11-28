@@ -4,6 +4,32 @@
 
 ### Latest Updates (Session: November 28, 2025)
 
+#### AI Export & Deep Analysis Security Hardening ✅
+**Date:** November 28, 2025
+
+Completed security audit and fixes for AI export and deep analysis services:
+
+**ai-export.routes.ts:**
+- ✅ All handlers now use `SchoolScopedRequest` type casting
+- ✅ `exportForAI`, `generatePrompt`, `getStudentAggregation` pass schoolId to services
+
+**ai-export.service.ts:**
+- ✅ `exportSessionsForAI(schoolId, sessionIds?)` - requires schoolId parameter
+- ✅ `aggregateSessionDataForStudent(studentId, schoolId)` - requires schoolId parameter  
+- ✅ Uses school-scoped repository: `getSessionByIdAndSchool`, `getSessionsBySchool`
+- ✅ Fixed TypeScript type issues (topic, actionItems)
+
+**deep-analysis.service.ts:**
+- ✅ `generateComparativeAnalysis(studentId, schoolId)` - requires schoolId parameter
+- ✅ Uses `studentsRepo.getStudentByIdAndSchool()` for validation
+- ✅ `analyzeStudentTrajectory()` returns complete `StudentTrajectory` type with:
+  - `interventionPriority`: ACİL | YÜKSEK | ORTA | DÜŞÜK
+  - `recommendedActions`: string[]
+
+**Client-Side Security:**
+- ✅ `createSchoolHeaderInterceptor()` automatically adds X-School-Id to all requests
+- ✅ All API calls through `apiClient` include school context
+
 #### Exam Management School Isolation Complete ✅
 **Date:** November 28, 2025
 
