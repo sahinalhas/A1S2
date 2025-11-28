@@ -29,7 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/organisms/AlertDialog";
-import { Building2, Edit2, Trash2, Star, Plus, Save, Loader2, MapPin, Phone, Mail, User, Globe, Share2, Users, HelpCircle, Info } from "lucide-react";
+import { Building2, Edit2, Trash2, Star, Plus, Save, Loader2, MapPin, Phone, Mail, User, Globe, Share2, Users, HelpCircle, Info, MoreVertical } from "lucide-react";
 import { toast } from "sonner";
 import {
   Tooltip,
@@ -37,6 +37,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/organisms/Tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/organisms/DropdownMenu";
 
 interface EditingSchool extends School {
   isEditing?: boolean;
@@ -417,7 +423,7 @@ export default function SchoolSettingsTab() {
                   <Card className="group hover:shadow-xl transition-all duration-300 border-1 hover:border-primary/30 cursor-pointer overflow-hidden">
                     <div className="h-1 bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500" />
                     <CardContent className="pt-5 space-y-3">
-                      {/* Title with Badge */}
+                      {/* Title with Badge and Menu */}
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
@@ -428,12 +434,46 @@ export default function SchoolSettingsTab() {
                             <p className="text-xs text-muted-foreground ml-7">#{school.code}</p>
                           )}
                         </div>
-                        {school.isDefault && (
-                          <div className="flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
-                            <Star className="h-3 w-3 fill-current" />
-                            <span className="text-xs font-semibold">Varsayılan</span>
-                          </div>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {school.isDefault && (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
+                              <Star className="h-3 w-3 fill-current" />
+                              <span className="text-xs font-semibold">Varsayılan</span>
+                            </div>
+                          )}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 w-6 p-0 hover:bg-muted"
+                                disabled={isLoading}
+                              >
+                                <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-40">
+                              <DropdownMenuItem onClick={() => setEditingSchool(school)} disabled={isLoading}>
+                                <Edit2 className="h-4 w-4 mr-2" />
+                                <span>Düzenle</span>
+                              </DropdownMenuItem>
+                              {!school.isDefault && (
+                                <DropdownMenuItem onClick={() => handleSetDefault(school.id)} disabled={isLoading}>
+                                  <Star className="h-4 w-4 mr-2" />
+                                  <span>Varsayılan Yap</span>
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem
+                                onClick={() => setDeletingSchoolId(school.id)}
+                                disabled={isLoading}
+                                className="text-red-600 focus:text-red-600"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                <span>Sil</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </div>
 
                       {/* Details Grid */}
@@ -480,61 +520,6 @@ export default function SchoolSettingsTab() {
                             <span className="text-xs">{school.socialMedia}</span>
                           </div>
                         )}
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex gap-2 pt-2 border-t">
-                        {!school.isDefault && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleSetDefault(school.id)}
-                                disabled={isLoading}
-                                className="flex-1 text-xs hover:bg-yellow-100 hover:text-yellow-800"
-                              >
-                                <Star className="h-3 w-3 mr-1" />
-                                Varsayılan
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="top" className="text-xs">
-                              Bu okulu varsayılan okul olarak ayarla. Sisteme girdiğinizde bu okul otomatik olarak açılacak.
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setEditingSchool(school)}
-                              disabled={isLoading}
-                              className="text-xs hover:bg-blue-100 hover:text-blue-700"
-                            >
-                              <Edit2 className="h-3 w-3" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" className="text-xs">
-                            Okul bilgilerini düzenle
-                          </TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setDeletingSchoolId(school.id)}
-                              disabled={isLoading}
-                              className="text-xs hover:bg-red-100 hover:text-red-700"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" className="text-xs">
-                            Okulu sil (geri alınamaz)
-                          </TooltipContent>
-                        </Tooltip>
                       </div>
                     </CardContent>
                   </Card>
