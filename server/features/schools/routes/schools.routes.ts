@@ -102,13 +102,36 @@ export function updateSchool(req: AuthenticatedRequest, res: Response): void {
   }
 }
 
-export function deleteSchool(req: AuthenticatedRequest, res: Response): void {
+export async function deleteSchool(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const schoolId = req.params.schoolId;
     const userId = req.user?.id;
+    const { password } = req.body;
     
     if (!userId) {
       res.status(401).json({ success: false, message: 'Not authenticated' });
+      return;
+    }
+
+    if (!password || password.trim() === '') {
+      res.status(400).json({ success: false, message: 'Şifre gereklidir' });
+      return;
+    }
+    
+    // Get user from database to verify password
+    const db = require('../../../lib/database.js').default();
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId) as { id: string; passwordHash: string } | undefined;
+    
+    if (!user) {
+      res.status(401).json({ success: false, message: 'User not found' });
+      return;
+    }
+    
+    // Verify password
+    const bcrypt = require('bcryptjs');
+    const passwordMatch = await bcrypt.compare(password, user.passwordHash || '');
+    if (!passwordMatch) {
+      res.status(401).json({ success: false, message: 'Şifre yanlış' });
       return;
     }
     

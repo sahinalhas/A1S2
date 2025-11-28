@@ -45,6 +45,7 @@ export default function SchoolSettingsTab() {
   const [isLoading, setIsLoading] = useState(false);
   const [editingSchool, setEditingSchool] = useState<EditingSchool | null>(null);
   const [deletingSchoolId, setDeletingSchoolId] = useState<string | null>(null);
+  const [deletingSchoolPassword, setDeletingSchoolPassword] = useState("");
   const [showNewSchoolDialog, setShowNewSchoolDialog] = useState(false);
   const [newSchool, setNewSchool] = useState<Partial<School>>({
     name: "",
@@ -105,17 +106,27 @@ export default function SchoolSettingsTab() {
   };
 
   const handleDeleteSchool = async (schoolId: string) => {
+    if (!deletingSchoolPassword.trim()) {
+      toast.error("Şifrenizi giriniz");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const response = await fetch(`/api/schools/${schoolId}`, {
         method: "DELETE",
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
+        body: JSON.stringify({
+          password: deletingSchoolPassword,
+        }),
       });
 
       const result = await response.json();
       if (result.success) {
         toast.success("Okul silindi");
         await loadUserSchools();
+        setDeletingSchoolPassword("");
       } else {
         toast.error(result.message || "Silme başarısız");
       }
@@ -591,28 +602,76 @@ export default function SchoolSettingsTab() {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deletingSchoolId} onOpenChange={(open) => !open && setDeletingSchoolId(null)}>
-        <AlertDialogContent>
+      <AlertDialog open={!!deletingSchoolId} onOpenChange={(open) => {
+        if (!open) {
+          setDeletingSchoolId(null);
+          setDeletingSchoolPassword("");
+        }
+      }}>
+        <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>Okulu Sil</AlertDialogTitle>
-            <AlertDialogDescription>
-              Bu okulu silmek istediğinize emin misiniz? Bu işlem geri alınamaz.
-            </AlertDialogDescription>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+              <Trash2 className="h-5 w-5" />
+              Okulu Kalıcı Olarak Sil
+            </AlertDialogTitle>
           </AlertDialogHeader>
-          <AlertDialogCancel>İptal</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={() => deletingSchoolId && handleDeleteSchool(deletingSchoolId)}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Siliniyor
-              </>
-            ) : (
-              "Sil"
-            )}
-          </AlertDialogAction>
+          
+          <div className="space-y-4 py-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-2">
+              <p className="text-sm font-semibold text-red-900">⚠️ Uyarı: Bu işlem geri alınamaz!</p>
+              <div className="text-xs text-red-800 space-y-1">
+                <p>• Okulun tüm verileri silinecek</p>
+                <p>• Tüm öğrenci kayıtları kaldırılacak</p>
+                <p>• Tüm rehberlik oturumları silinecek</p>
+                <p>• Raporlar ve analizler kaybedilecek</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="deletePassword" className="text-sm font-medium">
+                Şifrelerinizi Girin (Doğrulama İçin)
+              </Label>
+              <Input
+                id="deletePassword"
+                type="password"
+                placeholder="Şifrenizi giriniz..."
+                value={deletingSchoolPassword}
+                onChange={(e) => setDeletingSchoolPassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && deletingSchoolPassword.trim()) {
+                    deletingSchoolId && handleDeleteSchool(deletingSchoolId);
+                  }
+                }}
+                disabled={isLoading}
+              />
+              <p className="text-xs text-muted-foreground">
+                Yanlışlıkla silmeyi önlemek için şifreniz gereklidir
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <AlertDialogCancel disabled={isLoading}>
+              İptal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deletingSchoolId && handleDeleteSchool(deletingSchoolId)}
+              disabled={!deletingSchoolPassword.trim() || isLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Siliniyor
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Okulu Sil
+                </>
+              )}
+            </AlertDialogAction>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
     </div>
