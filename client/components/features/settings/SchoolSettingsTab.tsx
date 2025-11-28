@@ -29,8 +29,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/organisms/AlertDialog";
-import { Building2, Edit2, Trash2, Star, Plus, Save, Loader2, MapPin, Phone, Mail, User, Globe, Share2, Users } from "lucide-react";
+import { Building2, Edit2, Trash2, Star, Plus, Save, Loader2, MapPin, Phone, Mail, User, Globe, Share2, Users, HelpCircle, Info } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/organisms/Tooltip";
 
 interface EditingSchool extends School {
   isEditing?: boolean;
@@ -228,12 +234,42 @@ export default function SchoolSettingsTab() {
   }, [componentId, settingsContext]);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="space-y-2">
-        <h2 className="text-xl font-semibold">Okullarım</h2>
-        <p className="text-sm text-muted-foreground">Çalıştığınız okulları yönetin ve varsayılan okulunuzu seçin</p>
-      </div>
+    <TooltipProvider>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="space-y-2">
+          <h2 className="text-xl font-semibold">Okullarım</h2>
+          <p className="text-sm text-muted-foreground">Çalıştığınız okulları yönetin ve varsayılan okulunuzu seçin</p>
+        </div>
+
+        {/* Informative Section */}
+        <div className="grid gap-4 md:grid-cols-2">
+          {/* Default School Info */}
+          <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950/20 dark:border-blue-800">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-3">
+                <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-sm text-blue-900 dark:text-blue-100">Varsayılan Okul Nedir?</h3>
+                  <p className="text-xs text-blue-800 dark:text-blue-200">Varsayılan okul, sisteme girdiğinizde otomatik olarak açılan okulunuzdur. Pano ve raporlar varsayılan okulunuzun verilerine göre hazırlanır. Dilediğiniz zaman değiştirebilirsiniz.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Multiple Schools Info */}
+          <Card className="bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-800">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-3">
+                <Info className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-sm text-emerald-900 dark:text-emerald-100">Birden Fazla Okulda Görevli misiniz?</h3>
+                  <p className="text-xs text-emerald-800 dark:text-emerald-200">Farklı okullarda görev yapıyorsanız, her birini sisteme ayrı ayrı ekleyebilirsiniz. Sağ üstte bulunan okul seçicide kolayca okul değiştirebilirsiniz.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
       {schools.length === 0 ? (
         <motion.div
@@ -449,35 +485,56 @@ export default function SchoolSettingsTab() {
                       {/* Action Buttons */}
                       <div className="flex gap-2 pt-2 border-t">
                         {!school.isDefault && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleSetDefault(school.id)}
-                            disabled={isLoading}
-                            className="flex-1 text-xs hover:bg-yellow-100 hover:text-yellow-800"
-                          >
-                            <Star className="h-3 w-3 mr-1" />
-                            Varsayılan
-                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleSetDefault(school.id)}
+                                disabled={isLoading}
+                                className="flex-1 text-xs hover:bg-yellow-100 hover:text-yellow-800"
+                              >
+                                <Star className="h-3 w-3 mr-1" />
+                                Varsayılan
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="text-xs">
+                              Bu okulu varsayılan okul olarak ayarla. Sisteme girdiğinizde bu okul otomatik olarak açılacak.
+                            </TooltipContent>
+                          </Tooltip>
                         )}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setEditingSchool(school)}
-                          disabled={isLoading}
-                          className="text-xs hover:bg-blue-100 hover:text-blue-700"
-                        >
-                          <Edit2 className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setDeletingSchoolId(school.id)}
-                          disabled={isLoading}
-                          className="text-xs hover:bg-red-100 hover:text-red-700"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingSchool(school)}
+                              disabled={isLoading}
+                              className="text-xs hover:bg-blue-100 hover:text-blue-700"
+                            >
+                              <Edit2 className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="text-xs">
+                            Okul bilgilerini düzenle
+                          </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDeletingSchoolId(school.id)}
+                              disabled={isLoading}
+                              className="text-xs hover:bg-red-100 hover:text-red-700"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="text-xs">
+                            Okulu sil (geri alınamaz)
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </CardContent>
                   </Card>
@@ -697,6 +754,7 @@ export default function SchoolSettingsTab() {
           </div>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }
