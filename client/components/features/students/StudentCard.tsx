@@ -141,30 +141,6 @@ export function StudentCard({
  <Button
  asChild
  size="sm"
- className="flex-1 text-xs h-9 bg-purple-600 hover:bg-purple-700 text-white shadow-sm"
- onClick={(e) => e.stopPropagation()}
- title="Akademik Durum"
- >
- <Link to={`/ogrenci/${student.id}?tab=academic`}>
- <GraduationCap className="h-3.5 w-3.5" />
- </Link>
- </Button>
-
- <Button
- asChild
- size="sm"
- className="flex-1 text-xs h-9 bg-pink-600 hover:bg-pink-700 text-white shadow-sm"
- onClick={(e) => e.stopPropagation()}
- title="Psikososyal Durum"
- >
- <Link to={`/ogrenci/${student.id}?tab=psychosocial`}>
- <Heart className="h-3.5 w-3.5" />
- </Link>
- </Button>
-
- <Button
- asChild
- size="sm"
  className="flex-1 text-xs h-9 bg-orange-600 hover:bg-orange-700 text-white shadow-sm"
  onClick={(e) => e.stopPropagation()}
  title="Kariyer Rehberliği"

@@ -123,30 +123,6 @@ const StudentRow = memo(
  <Eye className="h-4 w-4" />
  </Link>
  </Button>
- 
- <Button 
- asChild 
- size="sm" 
- variant="ghost" 
- className="h-8 w-8 p-0 text-purple-600 hover:text-purple-700"
- title="Akademik Durum"
- >
- <Link to={`/ogrenci/${student.id}?tab=academic`}>
- <GraduationCap className="h-4 w-4" />
- </Link>
- </Button>
-
- <Button 
- asChild 
- size="sm" 
- variant="ghost" 
- className="h-8 w-8 p-0 text-pink-600 hover:text-pink-700"
- title="Psikososyal Durum"
- >
- <Link to={`/ogrenci/${student.id}?tab=psychosocial`}>
- <Heart className="h-4 w-4" />
- </Link>
- </Button>
 
  <Button 
  asChild 
