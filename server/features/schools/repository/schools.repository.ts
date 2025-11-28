@@ -13,7 +13,8 @@ function ensureInitialized(): void {
     getSchoolById: db.prepare('SELECT * FROM schools WHERE id = ?'),
     getSchoolByName: db.prepare('SELECT * FROM schools WHERE name = ?'),
     getUserSchools: db.prepare(`
-      SELECT s.*, us.isDefault FROM schools s
+      SELECT s.id, s.name, s.code, s.address, s.phone, s.email, s.principal, s.website, s.socialMedia, s.viceEducationDirector, COALESCE(us.isDefault, 0) as isDefault 
+      FROM schools s
       INNER JOIN user_schools us ON s.id = us.schoolId
       WHERE us.userId = ?
       ORDER BY s.name

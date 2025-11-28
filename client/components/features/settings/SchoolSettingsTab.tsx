@@ -29,7 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/organisms/AlertDialog";
-import { Building2, Edit2, Trash2, Star, Plus, Save, Loader2, X } from "lucide-react";
+import { Building2, Edit2, Trash2, Star, Plus, Save, Loader2, MapPin, Phone, Mail, User, Globe, Share2, Users } from "lucide-react";
 import { toast } from "sonner";
 
 interface EditingSchool extends School {
@@ -228,268 +228,291 @@ export default function SchoolSettingsTab() {
   }, [componentId, settingsContext]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="space-y-2">
+        <h2 className="text-xl font-semibold">Okullarım</h2>
+        <p className="text-sm text-muted-foreground">Çalıştığınız okulları yönetin ve varsayılan okulunuzu seçin</p>
+      </div>
+
       {schools.length === 0 ? (
-        <Card className="border-muted">
-          <CardContent className="pt-6 text-center py-12">
-            <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground font-medium mb-4">Henüz bir okulunuz yok</p>
-            <Button onClick={() => setShowNewSchoolDialog(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              İlk Okulu Oluştur
-            </Button>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="border-2 border-dashed border-muted-foreground/20">
+            <CardContent className="pt-8 text-center py-12">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+                <Building2 className="h-8 w-8 text-primary" />
+              </div>
+              <p className="text-muted-foreground font-medium mb-1">Henüz bir okulunuz yok</p>
+              <p className="text-sm text-muted-foreground mb-6">Başlamak için ilk okulunuzu oluşturun</p>
+              <Button onClick={() => setShowNewSchoolDialog(true)} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700">
+                <Plus className="h-4 w-4 mr-2" />
+                İlk Okulu Oluştur
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
       ) : (
         <>
-          <div className="grid gap-4">
+          {/* Schools Grid */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {schools.map((school, index) => (
               <motion.div
                 key={school.id}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="border-muted hover:border-primary/50 transition-all">
-                  <CardContent className="pt-6">
-                    {editingSchool?.id === school.id ? (
-                      <div className="space-y-4">
-                        <div className="grid gap-4 md:grid-cols-2">
-                          <div className="space-y-2">
-                            <Label>Okul Adı *</Label>
-                            <Input
-                              value={editingSchool.name}
-                              onChange={(e) =>
-                                setEditingSchool({
-                                  ...editingSchool,
-                                  name: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Okul Kodu</Label>
+                {editingSchool?.id === school.id ? (
+                  <Card className="border-2 border-primary/50 shadow-lg">
+                    <CardContent className="pt-6 space-y-4">
+                      <div className="space-y-3">
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold text-muted-foreground">Okul Adı *</Label>
+                          <Input
+                            value={editingSchool.name}
+                            onChange={(e) => setEditingSchool({ ...editingSchool, name: e.target.value })}
+                            className="bg-secondary"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <Label className="text-xs font-semibold text-muted-foreground">Kodu</Label>
                             <Input
                               value={editingSchool.code || ""}
-                              onChange={(e) =>
-                                setEditingSchool({
-                                  ...editingSchool,
-                                  code: e.target.value,
-                                })
-                              }
+                              onChange={(e) => setEditingSchool({ ...editingSchool, code: e.target.value })}
+                              className="bg-secondary"
                             />
                           </div>
-                          <div className="space-y-2">
-                            <Label>Adres</Label>
-                            <Input
-                              value={editingSchool.address || ""}
-                              onChange={(e) =>
-                                setEditingSchool({
-                                  ...editingSchool,
-                                  address: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Telefon</Label>
+                          <div className="space-y-1">
+                            <Label className="text-xs font-semibold text-muted-foreground">Telefon</Label>
                             <Input
                               value={editingSchool.phone || ""}
-                              onChange={(e) =>
-                                setEditingSchool({
-                                  ...editingSchool,
-                                  phone: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>E-posta</Label>
-                            <Input
-                              type="email"
-                              value={editingSchool.email || ""}
-                              onChange={(e) =>
-                                setEditingSchool({
-                                  ...editingSchool,
-                                  email: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Müdür Adı</Label>
-                            <Input
-                              value={editingSchool.principal || ""}
-                              onChange={(e) =>
-                                setEditingSchool({
-                                  ...editingSchool,
-                                  principal: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Web Sitesi</Label>
-                            <Input
-                              type="url"
-                              placeholder="https://..."
-                              value={editingSchool.website || ""}
-                              onChange={(e) =>
-                                setEditingSchool({
-                                  ...editingSchool,
-                                  website: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Sosyal Medya</Label>
-                            <Input
-                              placeholder="Instagram, Facebook vb."
-                              value={editingSchool.socialMedia || ""}
-                              onChange={(e) =>
-                                setEditingSchool({
-                                  ...editingSchool,
-                                  socialMedia: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Müdür Yardımcısı</Label>
-                            <Input
-                              value={editingSchool.viceEducationDirector || ""}
-                              onChange={(e) =>
-                                setEditingSchool({
-                                  ...editingSchool,
-                                  viceEducationDirector: e.target.value,
-                                })
-                              }
+                              onChange={(e) => setEditingSchool({ ...editingSchool, phone: e.target.value })}
+                              className="bg-secondary"
                             />
                           </div>
                         </div>
-                        <div className="flex gap-2 pt-2 border-t">
-                          <Button
-                            variant="outline"
-                            onClick={() => setEditingSchool(null)}
-                            disabled={isLoading}
-                            className="flex-1"
-                          >
-                            İptal
-                          </Button>
-                          <Button
-                            onClick={handleEditSchool}
-                            disabled={isLoading}
-                            className="flex-1 bg-green-600 hover:bg-green-700"
-                          >
-                            {isLoading ? (
-                              <>
-                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                Kaydediliyor
-                              </>
-                            ) : (
-                              <>
-                                <Save className="h-4 w-4 mr-2" />
-                                Kaydet
-                              </>
-                            )}
-                          </Button>
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold text-muted-foreground">Adres</Label>
+                          <Input
+                            value={editingSchool.address || ""}
+                            onChange={(e) => setEditingSchool({ ...editingSchool, address: e.target.value })}
+                            className="bg-secondary text-xs"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold text-muted-foreground">E-posta</Label>
+                          <Input
+                            type="email"
+                            value={editingSchool.email || ""}
+                            onChange={(e) => setEditingSchool({ ...editingSchool, email: e.target.value })}
+                            className="bg-secondary"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold text-muted-foreground">Müdür</Label>
+                          <Input
+                            value={editingSchool.principal || ""}
+                            onChange={(e) => setEditingSchool({ ...editingSchool, principal: e.target.value })}
+                            className="bg-secondary"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold text-muted-foreground">Müdür Yardımcısı</Label>
+                          <Input
+                            value={editingSchool.viceEducationDirector || ""}
+                            onChange={(e) => setEditingSchool({ ...editingSchool, viceEducationDirector: e.target.value })}
+                            className="bg-secondary"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold text-muted-foreground">Web Sitesi</Label>
+                          <Input
+                            type="url"
+                            placeholder="https://..."
+                            value={editingSchool.website || ""}
+                            onChange={(e) => setEditingSchool({ ...editingSchool, website: e.target.value })}
+                            className="bg-secondary"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs font-semibold text-muted-foreground">Sosyal Medya</Label>
+                          <Input
+                            placeholder="Instagram, Facebook vb."
+                            value={editingSchool.socialMedia || ""}
+                            onChange={(e) => setEditingSchool({ ...editingSchool, socialMedia: e.target.value })}
+                            className="bg-secondary"
+                          />
                         </div>
                       </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Building2 className="h-5 w-5 text-primary" />
-                              <h3 className="font-semibold text-lg">{school.name}</h3>
-                              {school.isDefault && (
-                                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                              )}
-                            </div>
-                            {school.code && (
-                              <p className="text-sm text-muted-foreground">Kod: {school.code}</p>
-                            )}
-                            {school.address && (
-                              <p className="text-sm text-muted-foreground">Adres: {school.address}</p>
-                            )}
-                            {school.phone && (
-                              <p className="text-sm text-muted-foreground">Telefon: {school.phone}</p>
-                            )}
-                            {school.email && (
-                              <p className="text-sm text-muted-foreground">E-posta: {school.email}</p>
-                            )}
-                            {school.principal && (
-                              <p className="text-sm text-muted-foreground">Müdür: {school.principal}</p>
-                            )}
-                            {school.viceEducationDirector && (
-                              <p className="text-sm text-muted-foreground">Müdür Yardımcısı: {school.viceEducationDirector}</p>
-                            )}
-                            {school.website && (
-                              <p className="text-sm text-muted-foreground">
-                                Web: <a href={school.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{school.website}</a>
-                              </p>
-                            )}
-                            {school.socialMedia && (
-                              <p className="text-sm text-muted-foreground">Sosyal Medya: {school.socialMedia}</p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex gap-2 pt-2 border-t">
-                          {!school.isDefault && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleSetDefault(school.id)}
-                              disabled={isLoading}
-                              className="flex-1"
-                            >
-                              <Star className="h-4 w-4 mr-2" />
-                              Varsayılan Yap
-                            </Button>
+                      <div className="flex gap-2 pt-2 border-t">
+                        <Button
+                          variant="outline"
+                          onClick={() => setEditingSchool(null)}
+                          disabled={isLoading}
+                          className="flex-1 text-xs"
+                        >
+                          İptal
+                        </Button>
+                        <Button
+                          onClick={handleEditSchool}
+                          disabled={isLoading}
+                          className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-xs text-white"
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                              Kaydediliyor
+                            </>
+                          ) : (
+                            <>
+                              <Save className="h-3 w-3 mr-1" />
+                              Kaydet
+                            </>
                           )}
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setEditingSchool(school)}
-                            disabled={isLoading}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => setDeletingSchoolId(school.id)}
-                            disabled={isLoading}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
+                        </Button>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card className="group hover:shadow-xl transition-all duration-300 border-1 hover:border-primary/30 cursor-pointer overflow-hidden">
+                    <div className="h-1 bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500" />
+                    <CardContent className="pt-5 space-y-3">
+                      {/* Title with Badge */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Building2 className="h-5 w-5 text-primary" />
+                            <h3 className="font-bold text-base group-hover:text-primary transition-colors">{school.name}</h3>
+                          </div>
+                          {school.code && (
+                            <p className="text-xs text-muted-foreground ml-7">#{school.code}</p>
+                          )}
+                        </div>
+                        {school.isDefault && (
+                          <div className="flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
+                            <Star className="h-3 w-3 fill-current" />
+                            <span className="text-xs font-semibold">Varsayılan</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Details Grid */}
+                      <div className="space-y-2 text-sm">
+                        {school.address && (
+                          <div className="flex items-start gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0 text-primary" />
+                            <span className="text-xs line-clamp-2">{school.address}</span>
+                          </div>
+                        )}
+                        {school.phone && (
+                          <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Phone className="h-4 w-4 flex-shrink-0 text-primary" />
+                            <a href={`tel:${school.phone}`} className="text-xs hover:underline">{school.phone}</a>
+                          </div>
+                        )}
+                        {school.email && (
+                          <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Mail className="h-4 w-4 flex-shrink-0 text-primary" />
+                            <a href={`mailto:${school.email}`} className="text-xs hover:underline truncate">{school.email}</a>
+                          </div>
+                        )}
+                        {school.principal && (
+                          <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <User className="h-4 w-4 flex-shrink-0 text-blue-500" />
+                            <span className="text-xs">Müdür: {school.principal}</span>
+                          </div>
+                        )}
+                        {school.viceEducationDirector && (
+                          <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Users className="h-4 w-4 flex-shrink-0 text-blue-500" />
+                            <span className="text-xs">M. Yardımcısı: {school.viceEducationDirector}</span>
+                          </div>
+                        )}
+                        {school.website && (
+                          <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Globe className="h-4 w-4 flex-shrink-0 text-cyan-500" />
+                            <a href={school.website} target="_blank" rel="noopener noreferrer" className="text-xs hover:underline text-primary">Web Sitesi</a>
+                          </div>
+                        )}
+                        {school.socialMedia && (
+                          <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Share2 className="h-4 w-4 flex-shrink-0 text-pink-500" />
+                            <span className="text-xs">{school.socialMedia}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex gap-2 pt-2 border-t">
+                        {!school.isDefault && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleSetDefault(school.id)}
+                            disabled={isLoading}
+                            className="flex-1 text-xs hover:bg-yellow-100 hover:text-yellow-800"
+                          >
+                            <Star className="h-3 w-3 mr-1" />
+                            Varsayılan
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditingSchool(school)}
+                          disabled={isLoading}
+                          className="text-xs hover:bg-blue-100 hover:text-blue-700"
+                        >
+                          <Edit2 className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeletingSchoolId(school.id)}
+                          disabled={isLoading}
+                          className="text-xs hover:bg-red-100 hover:text-red-700"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </motion.div>
             ))}
-          </div>
 
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => setShowNewSchoolDialog(true)}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Yeni Okul Ekle
-          </Button>
+            {/* Add New School Button */}
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: schools.length * 0.1 }}
+              onClick={() => setShowNewSchoolDialog(true)}
+              className="group"
+            >
+              <Card className="h-full cursor-pointer border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 transition-all hover:shadow-md hover:bg-muted/50">
+                <CardContent className="pt-6 h-full flex flex-col items-center justify-center py-12 text-center">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-3 group-hover:bg-primary/20 transition-colors">
+                    <Plus className="h-6 w-6 text-primary" />
+                  </div>
+                  <p className="font-medium text-sm group-hover:text-primary transition-colors">Yeni Okul Ekle</p>
+                  <p className="text-xs text-muted-foreground mt-1">Başka bir okul ekleyin</p>
+                </CardContent>
+              </Card>
+            </motion.button>
+          </div>
         </>
       )}
 
       {/* New School Dialog */}
       <Dialog open={showNewSchoolDialog} onOpenChange={setShowNewSchoolDialog}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Yeni Okul Oluştur</DialogTitle>
-            <DialogDescription>Yeni bir okul ekleyin</DialogDescription>
+            <DialogTitle>Yeni Okul Ekle</DialogTitle>
+            <DialogDescription>Sisteme yeni bir okul ekleyin</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -501,31 +524,33 @@ export default function SchoolSettingsTab() {
                 onChange={(e) => setNewSchool({ ...newSchool, name: e.target.value })}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="newSchoolCode">Okul Kodu</Label>
-              <Input
-                id="newSchoolCode"
-                placeholder="Okul kodunu girin"
-                value={newSchool.code || ""}
-                onChange={(e) => setNewSchool({ ...newSchool, code: e.target.value })}
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="newSchoolCode">Okul Kodu</Label>
+                <Input
+                  id="newSchoolCode"
+                  placeholder="Kod girin"
+                  value={newSchool.code || ""}
+                  onChange={(e) => setNewSchool({ ...newSchool, code: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="newSchoolPhone">Telefon</Label>
+                <Input
+                  id="newSchoolPhone"
+                  placeholder="Telefon girin"
+                  value={newSchool.phone || ""}
+                  onChange={(e) => setNewSchool({ ...newSchool, phone: e.target.value })}
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="newSchoolAddress">Adres</Label>
               <Input
                 id="newSchoolAddress"
-                placeholder="Okul adresini girin"
+                placeholder="Adres girin"
                 value={newSchool.address || ""}
                 onChange={(e) => setNewSchool({ ...newSchool, address: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="newSchoolPhone">Telefon</Label>
-              <Input
-                id="newSchoolPhone"
-                placeholder="Okul telefonunu girin"
-                value={newSchool.phone || ""}
-                onChange={(e) => setNewSchool({ ...newSchool, phone: e.target.value })}
               />
             </div>
             <div className="space-y-2">
@@ -533,19 +558,30 @@ export default function SchoolSettingsTab() {
               <Input
                 id="newSchoolEmail"
                 type="email"
-                placeholder="Okul e-postasını girin"
+                placeholder="E-posta girin"
                 value={newSchool.email || ""}
                 onChange={(e) => setNewSchool({ ...newSchool, email: e.target.value })}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="newSchoolPrincipal">Müdür Adı</Label>
-              <Input
-                id="newSchoolPrincipal"
-                placeholder="Müdür adını girin"
-                value={newSchool.principal || ""}
-                onChange={(e) => setNewSchool({ ...newSchool, principal: e.target.value })}
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="newSchoolPrincipal">Müdür Adı</Label>
+                <Input
+                  id="newSchoolPrincipal"
+                  placeholder="Müdür adı"
+                  value={newSchool.principal || ""}
+                  onChange={(e) => setNewSchool({ ...newSchool, principal: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="newSchoolViceDirector">Müdür Yardımcısı</Label>
+                <Input
+                  id="newSchoolViceDirector"
+                  placeholder="Yardımcı adı"
+                  value={newSchool.viceEducationDirector || ""}
+                  onChange={(e) => setNewSchool({ ...newSchool, viceEducationDirector: e.target.value })}
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="newSchoolWebsite">Web Sitesi</Label>
@@ -566,25 +602,12 @@ export default function SchoolSettingsTab() {
                 onChange={(e) => setNewSchool({ ...newSchool, socialMedia: e.target.value })}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="newSchoolViceDirector">Müdür Yardımcısı</Label>
-              <Input
-                id="newSchoolViceDirector"
-                placeholder="Müdür yardımcısının adını girin"
-                value={newSchool.viceEducationDirector || ""}
-                onChange={(e) => setNewSchool({ ...newSchool, viceEducationDirector: e.target.value })}
-              />
-            </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowNewSchoolDialog(false)}
-              disabled={isLoading}
-            >
+            <Button variant="outline" onClick={() => setShowNewSchoolDialog(false)} disabled={isLoading}>
               İptal
             </Button>
-            <Button onClick={handleCreateSchool} disabled={isLoading}>
+            <Button onClick={handleCreateSchool} disabled={isLoading} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700">
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -593,7 +616,7 @@ export default function SchoolSettingsTab() {
               ) : (
                 <>
                   <Plus className="h-4 w-4 mr-2" />
-                  Oluştur
+                  Okul Ekle
                 </>
               )}
             </Button>
