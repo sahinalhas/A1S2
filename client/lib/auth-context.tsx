@@ -15,6 +15,7 @@ export interface School {
   phone?: string;
   email?: string;
   principal?: string;
+  isDefault?: number;
 }
 
 export interface User {
@@ -170,7 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Load user schools
             const schools = await loadUserSchools();
             
-            // Auto-select first school if only one, otherwise try to restore from storage
+            // Auto-select first school if only one, otherwise use default or restore from storage
             if (schools.length === 1) {
               selectSchool(schools[0]);
             } else if (schools.length === 0) {
@@ -178,22 +179,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               localStorage.removeItem(SELECTED_SCHOOL_KEY);
               setNeedsSchoolSelection(true);
             } else if (schools.length > 1) {
-              // Try to restore selected school from storage
-              const storedSchool = localStorage.getItem(SELECTED_SCHOOL_KEY);
-              if (storedSchool) {
-                try {
-                  const parsed = JSON.parse(storedSchool);
-                  const stillValid = schools.find(s => s.id === parsed.id);
-                  if (stillValid) {
-                    setSelectedSchool(stillValid);
-                  } else {
+              // Look for default school first
+              const defaultSchool = schools.find(s => s.isDefault);
+              if (defaultSchool) {
+                selectSchool(defaultSchool);
+              } else {
+                // Try to restore selected school from storage
+                const storedSchool = localStorage.getItem(SELECTED_SCHOOL_KEY);
+                if (storedSchool) {
+                  try {
+                    const parsed = JSON.parse(storedSchool);
+                    const stillValid = schools.find(s => s.id === parsed.id);
+                    if (stillValid) {
+                      setSelectedSchool(stillValid);
+                    } else {
+                      setNeedsSchoolSelection(true);
+                    }
+                  } catch {
                     setNeedsSchoolSelection(true);
                   }
-                } catch {
+                } else {
                   setNeedsSchoolSelection(true);
                 }
-              } else {
-                setNeedsSchoolSelection(true);
               }
             }
           }
@@ -231,7 +238,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Load user schools after login
         const schools = await loadUserSchools();
         
-        // Auto-select if only one school, otherwise require selection
+        // Auto-select if only one school, or use default if multiple schools exist
         if (schools.length === 1) {
           selectSchool(schools[0]);
         } else if (schools.length === 0) {
@@ -239,7 +246,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           localStorage.removeItem(SELECTED_SCHOOL_KEY);
           setNeedsSchoolSelection(true);
         } else if (schools.length > 1) {
-          setNeedsSchoolSelection(true);
+          // Look for default school first
+          const defaultSchool = schools.find(s => s.isDefault);
+          if (defaultSchool) {
+            selectSchool(defaultSchool);
+          } else {
+            setNeedsSchoolSelection(true);
+          }
         }
         
         return true;

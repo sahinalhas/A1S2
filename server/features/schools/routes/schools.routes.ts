@@ -75,3 +75,93 @@ export function createSchool(req: AuthenticatedRequest, res: Response): void {
     res.status(500).json({ success: false, message: 'Failed to create school' });
   }
 }
+
+export function updateSchool(req: AuthenticatedRequest, res: Response): void {
+  try {
+    const { name, code, address, phone, email, principal } = req.body;
+    const schoolId = req.params.schoolId;
+    
+    if (!name) {
+      res.status(400).json({ success: false, message: 'School name is required' });
+      return;
+    }
+    
+    const school = schoolsRepository.getSchoolById(schoolId);
+    if (!school) {
+      res.status(404).json({ success: false, message: 'School not found' });
+      return;
+    }
+    
+    schoolsRepository.updateSchool(schoolId, name, code, address, phone, email, principal);
+    
+    const updatedSchool = schoolsRepository.getSchoolById(schoolId);
+    res.json({ success: true, school: updatedSchool });
+  } catch (error) {
+    console.error('Error updating school:', error);
+    res.status(500).json({ success: false, message: 'Failed to update school' });
+  }
+}
+
+export function deleteSchool(req: AuthenticatedRequest, res: Response): void {
+  try {
+    const schoolId = req.params.schoolId;
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      res.status(401).json({ success: false, message: 'Not authenticated' });
+      return;
+    }
+    
+    const school = schoolsRepository.getSchoolById(schoolId);
+    if (!school) {
+      res.status(404).json({ success: false, message: 'School not found' });
+      return;
+    }
+    
+    // Check if user has access to this school
+    const userSchoolIds = schoolsRepository.getUserSchoolIds(userId);
+    if (!userSchoolIds.includes(schoolId)) {
+      res.status(403).json({ success: false, message: 'Access denied' });
+      return;
+    }
+    
+    schoolsRepository.deleteSchool(schoolId);
+    res.json({ success: true, message: 'School deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting school:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete school' });
+  }
+}
+
+export function setDefaultSchool(req: AuthenticatedRequest, res: Response): void {
+  try {
+    const schoolId = req.params.schoolId;
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      res.status(401).json({ success: false, message: 'Not authenticated' });
+      return;
+    }
+    
+    const school = schoolsRepository.getSchoolById(schoolId);
+    if (!school) {
+      res.status(404).json({ success: false, message: 'School not found' });
+      return;
+    }
+    
+    // Check if user has access to this school
+    const userSchoolIds = schoolsRepository.getUserSchoolIds(userId);
+    if (!userSchoolIds.includes(schoolId)) {
+      res.status(403).json({ success: false, message: 'Access denied' });
+      return;
+    }
+    
+    schoolsRepository.setDefaultSchool(userId, schoolId);
+    
+    const schools = schoolsRepository.getUserSchools(userId);
+    res.json({ success: true, schools });
+  } catch (error) {
+    console.error('Error setting default school:', error);
+    res.status(500).json({ success: false, message: 'Failed to set default school' });
+  }
+}

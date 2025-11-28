@@ -14,6 +14,7 @@ import {
 } from "@/lib/app-settings";
 import { useSearchParams, useLocation } from "react-router-dom";
 import GeneralSettingsTab from "@/components/features/settings/GeneralSettingsTab";
+import SchoolSettingsTab from "@/components/features/settings/SchoolSettingsTab";
 import NotificationsSettingsTab from "@/components/features/settings/NotificationsSettingsTab";
 import AISettingsTab from "@/components/features/settings/AISettingsTab";
 import CoursesSettingsTab from "@/components/features/settings/CoursesSettingsTab";
@@ -38,6 +39,7 @@ export default function SettingsPage() {
    const t = searchParams.get("tab") || "genel";
    const allowed = new Set([
      "genel",
+     "okullar",
      "bildirim",
      "ai",
      "dersler",
@@ -174,6 +176,10 @@ export default function SettingsPage() {
 
              <TabsContent value="genel">
                <GeneralSettingsTab />
+             </TabsContent>
+
+             <TabsContent value="okullar">
+               <SchoolSettingsTab />
              </TabsContent>
 
              <TabsContent value="bildirim">

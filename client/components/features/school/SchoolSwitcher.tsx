@@ -29,7 +29,7 @@ export default function SchoolSwitcher({ collapsed = false }: SchoolSwitcherProp
 
   const handleManageSchools = () => {
     setOpen(false);
-    navigate('/okul-sec');
+    navigate('/ayarlar?tab=okullar');
   };
 
   if (!selectedSchool) {

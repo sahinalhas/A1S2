@@ -26,6 +26,7 @@ export function createSchoolsTables(db: Database.Database): void {
       userId TEXT NOT NULL,
       schoolId TEXT NOT NULL,
       role TEXT NOT NULL DEFAULT 'counselor' CHECK(role IN ('owner', 'admin', 'counselor')),
+      isDefault INTEGER DEFAULT 0,
       joinedDate DATETIME DEFAULT CURRENT_TIMESTAMP,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,

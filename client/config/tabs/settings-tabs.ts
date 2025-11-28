@@ -1,4 +1,4 @@
-import { Globe, Bell, Sparkles, BookOpen, Shield, Archive, Target } from "lucide-react";
+import { Globe, Bell, Sparkles, BookOpen, Shield, Archive, Target, Building2 } from "lucide-react";
 import { TabConfig } from "./types";
 
 /**
@@ -10,6 +10,12 @@ export const SETTINGS_TABS: TabConfig[] = [
  label:"Genel",
  icon: Globe,
  description:"Genel uygulama ayarları"
+ },
+ {
+ value:"okullar",
+ label:"Okullar",
+ icon: Building2,
+ description:"Okul yönetimi ve varsayılan okul seçimi"
  },
  {
  value:"bildirim",

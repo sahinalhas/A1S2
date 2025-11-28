@@ -13,7 +13,7 @@ function ensureInitialized(): void {
     getSchoolById: db.prepare('SELECT * FROM schools WHERE id = ?'),
     getSchoolByName: db.prepare('SELECT * FROM schools WHERE name = ?'),
     getUserSchools: db.prepare(`
-      SELECT s.* FROM schools s
+      SELECT s.*, us.isDefault FROM schools s
       INNER JOIN user_schools us ON s.id = us.schoolId
       WHERE us.userId = ?
       ORDER BY s.name
@@ -24,6 +24,17 @@ function ensureInitialized(): void {
     insertSchool: db.prepare(`
       INSERT INTO schools (id, name, code, address, phone, email, principal)
       VALUES (?, ?, ?, ?, ?, ?, ?)
+    `),
+    updateSchool: db.prepare(`
+      UPDATE schools 
+      SET name = ?, code = ?, address = ?, phone = ?, email = ?, principal = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `),
+    deleteSchool: db.prepare('DELETE FROM schools WHERE id = ?'),
+    setDefaultSchool: db.prepare(`
+      UPDATE user_schools 
+      SET isDefault = CASE WHEN schoolId = ? THEN 1 ELSE 0 END
+      WHERE userId = ?
     `)
   };
   
@@ -50,6 +61,16 @@ export function insertSchool(id: string, name: string, code?: string, address?: 
   statements.insertSchool.run(id, name, code || null, address || null, phone || null, email || null, principal || null);
 }
 
+export function updateSchool(id: string, name: string, code?: string, address?: string, phone?: string, email?: string, principal?: string): void {
+  ensureInitialized();
+  statements.updateSchool.run(name, code || null, address || null, phone || null, email || null, principal || null, id);
+}
+
+export function deleteSchool(id: string): void {
+  ensureInitialized();
+  statements.deleteSchool.run(id);
+}
+
 export function getUserSchools(userId: string): any[] {
   ensureInitialized();
   return statements.getUserSchools.all(userId);
@@ -59,4 +80,9 @@ export function getUserSchoolIds(userId: string): string[] {
   ensureInitialized();
   const rows = statements.getUserSchoolIds.all(userId) as { schoolId: string }[];
   return rows.map(r => r.schoolId);
+}
+
+export function setDefaultSchool(userId: string, schoolId: string): void {
+  ensureInitialized();
+  statements.setDefaultSchool.run(schoolId, userId);
 }

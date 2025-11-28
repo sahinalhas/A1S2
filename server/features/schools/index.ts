@@ -8,5 +8,8 @@ router.get('/my-schools', requireSecureAuth, schoolsRoutes.getMySchools);
 router.get('/', requireSecureAuth, schoolsRoutes.getAllSchools);
 router.get('/:schoolId', requireSecureAuth, schoolsRoutes.getSchoolById);
 router.post('/', requireSecureAuth, schoolsRoutes.createSchool);
+router.put('/:schoolId', requireSecureAuth, schoolsRoutes.updateSchool);
+router.delete('/:schoolId', requireSecureAuth, schoolsRoutes.deleteSchool);
+router.post('/:schoolId/set-default', requireSecureAuth, schoolsRoutes.setDefaultSchool);
 
 export default router;
