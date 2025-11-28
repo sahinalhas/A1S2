@@ -463,7 +463,7 @@ export default function SchoolSettingsTab() {
                                 <Edit2 className="h-4 w-4 mr-2" />
                                 <span>Düzenle</span>
                               </DropdownMenuItem>
-                              {!school.isDefault && (
+                              {schools.length > 1 && !school.isDefault && (
                                 <DropdownMenuItem onClick={() => handleSetDefault(school.id)} disabled={isLoading}>
                                   <Star className="h-4 w-4 mr-2" />
                                   <span>Varsayılan Yap</span>
