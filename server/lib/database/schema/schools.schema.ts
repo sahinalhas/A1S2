@@ -48,25 +48,71 @@ export function seedDefaultSchools(db: Database.Database): void {
     const existingSchool = db.prepare('SELECT id FROM schools WHERE name = ?').get('Okul Rehberlik Servisi');
     
     if (!existingSchool) {
-      const schoolId = 'school-default-001';
-      db.prepare(`
-        INSERT INTO schools (id, name, code, created_at)
-        VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-      `).run(schoolId, 'Okul Rehberlik Servisi', 'DEFAULT');
-      
-      // Link admin user to default school
+      // Get admin user
       const adminUser = db.prepare('SELECT id FROM users WHERE email = ?').get('rehber@okul.edu.tr') as { id: string } | undefined;
-      if (adminUser) {
-        const userSchoolId = `user-school-${Date.now()}`;
+      if (!adminUser) return;
+
+      // Create 3 schools for testing multiple schools feature
+      const schools = [
+        {
+          id: 'school-001',
+          name: 'Atatürk Anadolu Lisesi',
+          code: 'AAL-001',
+          address: 'Ankara, Türkiye',
+          phone: '+90 (312) 555-0101',
+          email: 'ataturk@meb.gov.tr',
+          principal: 'Prof. Dr. Ahmet Yılmaz',
+          viceEducationDirector: 'Doç. Dr. Fatma Kaya',
+          website: 'https://ataturkanadolu.meb.gov.tr',
+          socialMedia: '@ataturkanadolu'
+        },
+        {
+          id: 'school-002',
+          name: 'İstanbul Bilim ve Teknoloji Lisesi',
+          code: 'IBTL-002',
+          address: 'İstanbul, Türkiye',
+          phone: '+90 (212) 555-0202',
+          email: 'ibtl@meb.gov.tr',
+          principal: 'Dr. Mehmet Özdemir',
+          viceEducationDirector: 'Yrd. Doç. Ayşe Demir',
+          website: 'https://istanbulbtl.meb.gov.tr',
+          socialMedia: '@ibtl_istanbul'
+        },
+        {
+          id: 'school-003',
+          name: 'İzmir Deniz Mühendislik Fakültesi Hazırlık',
+          code: 'IDMF-003',
+          address: 'İzmir, Türkiye',
+          phone: '+90 (232) 555-0303',
+          email: 'idmf@meb.gov.tr',
+          principal: 'Prof. Dr. Mustafa Erdoğan',
+          viceEducationDirector: 'Doç. Dr. Zeynep Aksoy',
+          website: 'https://izmirdeniz.meb.gov.tr',
+          socialMedia: '@idmf_izmir'
+        }
+      ];
+
+      // Insert schools
+      for (const school of schools) {
         db.prepare(`
-          INSERT OR IGNORE INTO user_schools (id, userId, schoolId, role, joinedDate)
-          VALUES (?, ?, ?, 'owner', CURRENT_TIMESTAMP)
-        `).run(userSchoolId, adminUser.id, schoolId);
+          INSERT INTO schools (id, name, code, address, phone, email, principal, viceEducationDirector, website, socialMedia, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        `).run(school.id, school.name, school.code, school.address, school.phone, school.email, school.principal, school.viceEducationDirector, school.website, school.socialMedia);
+      }
+
+      // Link all schools to admin user (first school as default)
+      for (let i = 0; i < schools.length; i++) {
+        const userSchoolId = `user-school-${i}-${Date.now()}`;
+        const isDefault = i === 0 ? 1 : 0; // First school is default
+        db.prepare(`
+          INSERT OR IGNORE INTO user_schools (id, userId, schoolId, role, isDefault, joinedDate)
+          VALUES (?, ?, ?, 'owner', ?, CURRENT_TIMESTAMP)
+        `).run(userSchoolId, adminUser.id, schools[i].id, isDefault);
       }
       
-      console.log('✅ Varsayılan okul oluşturuldu');
+      console.log('✅ Birden fazla okul oluşturuldu (test verisi)');
     }
   } catch (error) {
-    console.warn('Varsayılan okul oluşturma hatası:', error);
+    console.warn('Okul oluşturma hatası:', error);
   }
 }
