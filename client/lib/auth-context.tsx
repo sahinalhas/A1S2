@@ -174,38 +174,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Load user schools
             const schools = await loadUserSchools();
             
-            // Auto-select first school if only one, otherwise use default or restore from storage
-            if (schools.length === 1) {
-              selectSchool(schools[0], true);
-            } else if (schools.length === 0) {
-              // No schools - user needs to create one
-              localStorage.removeItem(SELECTED_SCHOOL_KEY);
-              setNeedsSchoolSelection(true);
-            } else if (schools.length > 1) {
-              // Look for default school first
-              const defaultSchool = schools.find(s => s.isDefault === 1 || s.isDefault === true);
-              if (defaultSchool) {
-                selectSchool(defaultSchool, true);
-              } else {
-                // Try to restore selected school from storage
-                const storedSchool = localStorage.getItem(SELECTED_SCHOOL_KEY);
-                if (storedSchool) {
-                  try {
-                    const parsed = JSON.parse(storedSchool);
-                    const stillValid = schools.find(s => s.id === parsed.id);
-                    if (stillValid) {
-                      setSelectedSchool(stillValid);
-                    } else {
-                      setNeedsSchoolSelection(true);
-                    }
-                  } catch {
-                    setNeedsSchoolSelection(true);
-                  }
-                } else {
-                  setNeedsSchoolSelection(true);
-                }
-              }
-            }
+            // Always show school selection screen - let user choose
+            localStorage.removeItem(SELECTED_SCHOOL_KEY);
+            setSelectedSchool(null);
+            setNeedsSchoolSelection(true);
           }
         }
       } catch (error) {
@@ -239,25 +211,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsAuthenticated(true);
 
         // Load user schools after login
-        const schools = await loadUserSchools();
+        await loadUserSchools();
         
-        // Auto-select if only one school, or use default if multiple schools exist
-        if (schools.length === 1) {
-          selectSchool(schools[0], true);
-        } else if (schools.length === 0) {
-          // No schools - user needs to create one
-          localStorage.removeItem(SELECTED_SCHOOL_KEY);
-          setNeedsSchoolSelection(true);
-        } else if (schools.length > 1) {
-          // Look for default school first
-          const defaultSchool = schools.find(s => s.isDefault === 1 || s.isDefault === true);
-          if (defaultSchool) {
-            selectSchool(defaultSchool, true);
-          } else {
-            // If no default school is set, set the first one as default
-            selectSchool(schools[0], true);
-          }
-        }
+        // Always show school selection screen - let user choose
+        localStorage.removeItem(SELECTED_SCHOOL_KEY);
+        setSelectedSchool(null);
+        setNeedsSchoolSelection(true);
         
         return true;
       }
