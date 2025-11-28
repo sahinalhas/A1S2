@@ -95,7 +95,7 @@ export default function AIInsightsDashboard() {
  icon={Brain}
  >
  <Tabs defaultValue="daily" className="w-full space-y-6">
- <TabsList className="grid w-full grid-cols-2">
+ <TabsList variant="minimal" className="w-full justify-start sm:justify-center">
  <TabsTrigger value="daily">
  Günlük Insights
  </TabsTrigger>

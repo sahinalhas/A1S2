@@ -34,9 +34,9 @@ export default function DevelopmentProfileSection({
 }: DevelopmentProfileSectionProps) {
  return (
  <Tabs defaultValue="sosyal-duygusal" className="space-y-4">
- <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
+ <TabsList variant="nested">
  {GELISIM_TABS.map(({ value, label, icon: Icon }) => (
- <TabsTrigger key={value} value={value} className="gap-2">
+ <TabsTrigger key={value} value={value}>
  <Icon className="h-4 w-4" />
  <span className="hidden sm:inline">{label}</span>
  </TabsTrigger>

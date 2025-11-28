@@ -241,16 +241,16 @@ export function EnhancedExcelImport({
  </DialogHeader>
 
  <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="flex-1 flex flex-col overflow-hidden">
- <TabsList className="grid w-full grid-cols-3">
- <TabsTrigger value="upload" disabled={isUploading}>
+ <TabsList variant="nested">
+ <TabsTrigger value="upload" variant="nested" disabled={isUploading}>
  <Upload className="h-4 w-4 mr-2" />
  Yükle
  </TabsTrigger>
- <TabsTrigger value="preview" disabled={!selectedFile || isUploading}>
+ <TabsTrigger value="preview" variant="nested" disabled={!selectedFile || isUploading}>
  <FileCheck className="h-4 w-4 mr-2" />
  Önizleme
  </TabsTrigger>
- <TabsTrigger value="result" disabled={!uploadResult}>
+ <TabsTrigger value="result" variant="nested" disabled={!uploadResult}>
  <CheckCircle2 className="h-4 w-4 mr-2" />
  Sonuç
  </TabsTrigger>

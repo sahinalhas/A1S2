@@ -55,16 +55,16 @@ export default function AIToolsHub({ studentId, studentName, onUpdate }: AITools
  <div className="space-y-6">
  {/* AI Araçları Sekmeleri */}
  <Tabs defaultValue="mudahale" className="space-y-4">
- <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
- <TabsTrigger value="mudahale" className="gap-2">
+ <TabsList variant="nested">
+ <TabsTrigger value="mudahale" variant="nested">
  <Shield className="h-4 w-4" />
  <span className="hidden sm:inline">Müdahale Önerileri</span>
  </TabsTrigger>
- <TabsTrigger value="raporlar" className="gap-2">
+ <TabsTrigger value="raporlar" variant="nested">
  <FileText className="h-4 w-4" />
  <span className="hidden sm:inline">Otomatik Raporlar</span>
  </TabsTrigger>
- <TabsTrigger value="veli-iletisim" className="gap-2">
+ <TabsTrigger value="veli-iletisim" variant="nested">
  <Mail className="h-4 w-4" />
  <span className="hidden sm:inline">Veli İletişimi</span>
  </TabsTrigger>
@@ -105,7 +105,7 @@ export default function AIToolsHub({ studentId, studentName, onUpdate }: AITools
  </CardHeader>
  <CardContent>
  <div className="flex flex-wrap gap-2">
- <Button onClick={handleAIChat} className="gap-2">
+ <Button onClick={handleAIChat}>
  <Bot className="h-4 w-4" />
  AI ile Konuş
  </Button>
@@ -113,7 +113,7 @@ export default function AIToolsHub({ studentId, studentName, onUpdate }: AITools
  variant="outline" 
  onClick={handleRiskAnalysis}
  disabled={analyzingRisk}
- className="gap-2"
+
  >
  {analyzingRisk ? (
  <Loader2 className="h-4 w-4" />

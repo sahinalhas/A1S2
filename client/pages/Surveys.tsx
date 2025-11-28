@@ -252,24 +252,24 @@ export default function Surveys() {
           transition={{ duration: 0.3 }}
         >
           <Tabs defaultValue="templates" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
-              <TabsTrigger value="templates" className="gap-2">
+            <TabsList variant="minimal" className="w-full justify-start sm:justify-center">
+              <TabsTrigger value="templates" variant="minimal">
                 <FileText className="h-4 w-4" />
                 <span className="hidden sm:inline">Şablonlar</span>
               </TabsTrigger>
-              <TabsTrigger value="distributions" className="gap-2">
+              <TabsTrigger value="distributions" variant="minimal">
                 <Send className="h-4 w-4" />
                 <span className="hidden sm:inline">Dağıtımlar</span>
               </TabsTrigger>
-              <TabsTrigger value="responses" className="gap-2">
+              <TabsTrigger value="responses" variant="minimal">
                 <MessageSquare className="h-4 w-4" />
                 <span className="hidden sm:inline">Yanıtlar</span>
               </TabsTrigger>
-              <TabsTrigger value="analytics" className="gap-2">
+              <TabsTrigger value="analytics" variant="minimal">
                 <BarChart3 className="h-4 w-4" />
                 <span className="hidden sm:inline">Analiz</span>
               </TabsTrigger>
-              <TabsTrigger value="ai-analysis" className="gap-2">
+              <TabsTrigger value="ai-analysis" variant="minimal">
                 <Brain className="h-4 w-4" />
                 <span className="hidden sm:inline">AI Analiz</span>
               </TabsTrigger>

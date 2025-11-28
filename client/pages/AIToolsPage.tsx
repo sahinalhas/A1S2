@@ -116,7 +116,7 @@ export default function AIToolsPage() {
  animate={{ opacity: 1, y: 0 }}
  transition={{ duration: 0.3 }}
  >
- <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
+ <TabsList variant="minimal" className="w-full justify-start sm:justify-center">
  {AI_TOOLS_TABS.map((tabConfig) => (
  <TabsTrigger 
  key={tabConfig.value} 

@@ -563,7 +563,7 @@ const PredictiveAnalysis = React.memo(function PredictiveAnalysis() {
  Öğrenci başarı tahminleri ve risk analizi
  </p>
  </div>
- <Button variant="outline" className="gap-2">
+ <Button variant="outline">
  <Download className="h-4 w-4" />
  Rapor İndir
  </Button>
@@ -571,9 +571,9 @@ const PredictiveAnalysis = React.memo(function PredictiveAnalysis() {
 
  <Tabs defaultValue="overview" className="space-y-4">
  <TabsList>
- <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
- <TabsTrigger value="student">Bireysel Analiz</TabsTrigger>
- <TabsTrigger value="warnings">Erken Uyarılar</TabsTrigger>
+ <TabsTrigger value="overview" variant="nested">Genel Bakış</TabsTrigger>
+ <TabsTrigger value="student" variant="nested">Bireysel Analiz</TabsTrigger>
+ <TabsTrigger value="warnings" variant="nested">Erken Uyarılar</TabsTrigger>
  </TabsList>
 
  <TabsContent value="overview" className="space-y-4">

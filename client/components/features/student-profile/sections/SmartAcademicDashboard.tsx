@@ -30,14 +30,15 @@ export default function SmartAcademicDashboard({
  <div className="space-y-6">
  {/* Akademik Alt Sekmeler */}
  <Tabs defaultValue={tabValue} className="space-y-4">
- <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
+ <TabsList variant="nested">
  {STUDENT_ACADEMIC_TABS.map((tabConfig) => {
  const Icon = tabConfig.icon;
  return (
  <TabsTrigger 
  key={tabConfig.value} 
  value={tabConfig.value}
- className="gap-2"
+ variant="nested"
+
  >
  {Icon && <Icon className="h-4 w-4" />}
  <span className="hidden sm:inline">{tabConfig.label}</span>

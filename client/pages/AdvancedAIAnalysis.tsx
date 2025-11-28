@@ -81,12 +81,12 @@ export default function AdvancedAIAnalysis() {
  icon={Sparkles}
  >
  <Tabs value={analysisMode} onValueChange={(v) => setAnalysisMode(v as any)} className="w-auto space-y-6">
- <TabsList className="grid w-full grid-cols-2">
- <TabsTrigger value="class" className="flex items-center gap-2">
+ <TabsList variant="minimal" className="w-full justify-start sm:justify-center">
+ <TabsTrigger value="class" variant="minimal">
  <Users className="h-4 w-4" />
  Sınıf Analizi
  </TabsTrigger>
- <TabsTrigger value="multi-student" className="flex items-center gap-2">
+ <TabsTrigger value="multi-student" variant="minimal">
  <Target className="h-4 w-4" />
  Çoklu Öğrenci
  </TabsTrigger>

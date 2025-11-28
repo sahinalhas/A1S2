@@ -160,12 +160,12 @@ export default function SettingsPage() {
              }}
              className="space-y-4"
            >
-             <TabsList className="grid w-full grid-cols-3 md:grid-cols-4 lg:grid-cols-7 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
+             <TabsList variant="minimal" className="w-full justify-start sm:justify-center">
                {SETTINGS_TABS.map((tabConfig) => (
                  <TabsTrigger
                    key={tabConfig.value}
                    value={tabConfig.value}
-                   className="gap-2"
+                   variant="minimal"
                    title={tabConfig.description}
                  >
                    {tabConfig.icon && <tabConfig.icon className="h-4 w-4" />}

@@ -259,16 +259,16 @@ export default function ParentAccess() {
  </div>
 
  <Tabs defaultValue="access" className="space-y-6">
- <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
- <TabsTrigger value="access" className="gap-2">
+ <TabsList variant="minimal" className="w-full justify-start sm:justify-center">
+ <TabsTrigger value="access" variant="minimal">
  <Link2 className="h-4 w-4" />
  <span className="hidden sm:inline">Dashboard Erişimi</span>
  </TabsTrigger>
- <TabsTrigger value="communication" className="gap-2">
+ <TabsTrigger value="communication" variant="minimal">
  <MessageSquare className="h-4 w-4" />
  <span className="hidden sm:inline">AI İletişim Araçları</span>
  </TabsTrigger>
- <TabsTrigger value="reports" className="gap-2">
+ <TabsTrigger value="reports" variant="minimal">
  <FileText className="h-4 w-4" />
  <span className="hidden sm:inline">Gelişim Raporları</span>
  </TabsTrigger>

@@ -437,12 +437,12 @@ export function EnhancedBulkResultsEntry({
  )}
 
  <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'table' | 'paste')} className="flex-1 flex flex-col overflow-hidden">
- <TabsList className="grid w-full max-w-md grid-cols-2">
- <TabsTrigger value="table" className="flex items-center gap-2">
+ <TabsList variant="nested">
+ <TabsTrigger value="table" variant="nested">
  <TableIcon className="h-4 w-4" />
  Tablo Girişi
  </TabsTrigger>
- <TabsTrigger value="paste" className="flex items-center gap-2">
+ <TabsTrigger value="paste" variant="nested">
  <ClipboardPaste className="h-4 w-4" />
  Yapıştır
  </TabsTrigger>

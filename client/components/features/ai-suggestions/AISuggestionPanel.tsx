@@ -184,14 +184,14 @@ export default function AISuggestionPanel({ studentId, className }: AISuggestion
  </div>
  ) : (
  <Tabs defaultValue="pending" className="w-full">
- <TabsList className="grid w-full grid-cols-3">
- <TabsTrigger value="pending">
+ <TabsList variant="nested">
+ <TabsTrigger value="pending" variant="nested">
  Bekleyen ({suggestions.length})
  </TabsTrigger>
- <TabsTrigger value="priority">
+ <TabsTrigger value="priority" variant="nested">
  Öncelikli
  </TabsTrigger>
- <TabsTrigger value="stats" disabled={!!studentId}>
+ <TabsTrigger value="stats" variant="nested" disabled={!!studentId}>
  İstatistikler
  </TabsTrigger>
  </TabsList>

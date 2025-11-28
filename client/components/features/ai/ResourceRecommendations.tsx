@@ -114,17 +114,17 @@ export default function ResourceRecommendations() {
  </CardHeader>
  <CardContent>
  <Tabs value={category || 'all'} onValueChange={(val) => setCategory(val === 'all' ? '' : val)}>
- <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-4">
- <TabsTrigger value="all">Tümü</TabsTrigger>
- <TabsTrigger value="akademik" className="flex items-center gap-2">
+ <TabsList variant="nested">
+ <TabsTrigger value="all" variant="nested">Tümü</TabsTrigger>
+ <TabsTrigger value="akademik" variant="nested">
  {categoryIcons.akademik}
  Akademik
  </TabsTrigger>
- <TabsTrigger value="sosyalDuygusal" className="flex items-center gap-2">
+ <TabsTrigger value="sosyalDuygusal" variant="nested">
  {categoryIcons.sosyalDuygusal}
  Sosyal
  </TabsTrigger>
- <TabsTrigger value="davranişsal" className="flex items-center gap-2">
+ <TabsTrigger value="davranişsal" variant="nested">
  {categoryIcons.davranişsal}
  Davranış
  </TabsTrigger>

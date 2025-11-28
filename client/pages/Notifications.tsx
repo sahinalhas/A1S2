@@ -183,20 +183,20 @@ export default function Notifications() {
  )}
 
  <Tabs defaultValue="all" onValueChange={setSelectedStatus}>
- <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
- <TabsTrigger value="all" className="gap-2">
+ <TabsList variant="minimal" className="w-full justify-start sm:justify-center">
+ <TabsTrigger value="all" variant="minimal">
  <Bell className="h-4 w-4" />
  <span className="hidden sm:inline">Tümü</span>
  </TabsTrigger>
- <TabsTrigger value="PENDING" className="gap-2">
+ <TabsTrigger value="PENDING" variant="minimal">
  <RefreshCw className="h-4 w-4" />
  <span className="hidden sm:inline">Bekleyen</span>
  </TabsTrigger>
- <TabsTrigger value="SENT" className="gap-2">
+ <TabsTrigger value="SENT" variant="minimal">
  <Mail className="h-4 w-4" />
  <span className="hidden sm:inline">Gönderilen</span>
  </TabsTrigger>
- <TabsTrigger value="FAILED" className="gap-2">
+ <TabsTrigger value="FAILED" variant="minimal">
  <MessageSquare className="h-4 w-4" />
  <span className="hidden sm:inline">Başarısız</span>
  </TabsTrigger>

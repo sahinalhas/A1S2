@@ -186,28 +186,28 @@ export default function CareerGuidanceSection({ studentId, studentName }: Career
  </CardHeader>
  <CardContent>
  <Tabs value={activeTab} onValueChange={setActiveTab}>
- <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
- <TabsTrigger value="analysis" className="gap-2">
+ <TabsList variant="nested">
+ <TabsTrigger value="analysis" variant="nested">
  <Sparkles className="h-4 w-4" />
  <span className="hidden sm:inline">Analiz</span>
  </TabsTrigger>
- <TabsTrigger value="explore" className="gap-2">
+ <TabsTrigger value="explore" variant="nested">
  <Briefcase className="h-4 w-4" />
  <span className="hidden sm:inline">Keşfet</span>
  </TabsTrigger>
- <TabsTrigger value="roadmap" className="gap-2">
+ <TabsTrigger value="roadmap" variant="nested">
  <MapPin className="h-4 w-4" />
  <span className="hidden sm:inline">Yol Haritası</span>
  </TabsTrigger>
- <TabsTrigger value="competencies" className="gap-2">
+ <TabsTrigger value="competencies" variant="nested">
  <Award className="h-4 w-4" />
  <span className="hidden sm:inline">Yetkinlikler</span>
  </TabsTrigger>
- <TabsTrigger value="compare" className="gap-2">
+ <TabsTrigger value="compare" variant="nested">
  <BarChart3 className="h-4 w-4" />
  <span className="hidden sm:inline">Karşılaştır</span>
  </TabsTrigger>
- <TabsTrigger value="history" className="gap-2">
+ <TabsTrigger value="history" variant="nested">
  <History className="h-4 w-4" />
  <span className="hidden sm:inline">Geçmiş</span>
  </TabsTrigger>
@@ -224,7 +224,7 @@ export default function CareerGuidanceSection({ studentId, studentName }: Career
  <Button
  onClick={handleAnalyze}
  disabled={loading}
- className="gap-2"
+
  >
  {loading ? (
  <><Loader2 className="h-4 w-4" /> Analiz Ediliyor...</>
@@ -481,7 +481,7 @@ export default function CareerGuidanceSection({ studentId, studentName }: Career
  Kişiselleştirilmiş Kariyer Gelişim Planı
  </CardDescription>
  </div>
- <Badge variant="outline" className="gap-1">
+ <Badge variant="outline">
  <Clock className="h-3 w-3" />
  {roadmap.estimatedCompletionTime}
  </Badge>
@@ -639,7 +639,7 @@ export default function CareerGuidanceSection({ studentId, studentName }: Career
  }}
  disabled={loading}
  variant="outline"
- className="gap-2"
+
  >
  {loading ? (
  <><Loader2 className="h-4 w-4" /> Yenileniyor...</>
@@ -799,7 +799,7 @@ export default function CareerGuidanceSection({ studentId, studentName }: Career
  {selectedCareersForComparison.map(careerId => {
  const career = careers.find(c => c.id === careerId);
  return (
- <Badge key={careerId} variant="secondary" className="gap-2">
+ <Badge key={careerId} variant="secondary">
  {career?.name}
  <button
  onClick={() => setSelectedCareersForComparison(selectedCareersForComparison.filter(id => id !== careerId))}

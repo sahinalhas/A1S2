@@ -50,7 +50,7 @@ export default function AdvancedStudentAnalysis() {
  </div>
 
  <Tabs defaultValue="psychological" className="space-y-6">
- <TabsList className="grid w-full grid-cols-3">
+ <TabsList variant="minimal" className="w-full justify-start sm:justify-center">
  <TabsTrigger value="psychological">
  Psikolojik Derinlik
  </TabsTrigger>

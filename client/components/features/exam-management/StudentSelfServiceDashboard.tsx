@@ -160,24 +160,24 @@ export function StudentSelfServiceDashboard({ studentId, studentName }: StudentS
  </div>
 
  <Tabs defaultValue="overview" className="space-y-4">
- <TabsList className="grid w-full grid-cols-3 md:grid-cols-5">
- <TabsTrigger value="overview">
+ <TabsList variant="nested">
+ <TabsTrigger value="overview" variant="nested">
  <BarChart3 className="h-4 w-4 mr-2" />
  Genel Bakış
  </TabsTrigger>
- <TabsTrigger value="goals">
+ <TabsTrigger value="goals" variant="nested">
  <Target className="h-4 w-4 mr-2" />
  Hedefler
  </TabsTrigger>
- <TabsTrigger value="analysis">
+ <TabsTrigger value="analysis" variant="nested">
  <TrendingUp className="h-4 w-4 mr-2" />
  Analiz
  </TabsTrigger>
- <TabsTrigger value="reports">
+ <TabsTrigger value="reports" variant="nested">
  <FileText className="h-4 w-4 mr-2" />
  Raporlar
  </TabsTrigger>
- <TabsTrigger value="alerts">
+ <TabsTrigger value="alerts" variant="nested">
  <Award className="h-4 w-4 mr-2" />
  Bildirimler
  </TabsTrigger>

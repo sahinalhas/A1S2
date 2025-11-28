@@ -430,17 +430,17 @@ export default function EnhancedCompleteSessionDialog({
  <Form {...form}>
  <form onSubmit={form.handleSubmit(handleSubmit, handleFormSubmit)} className="space-y-8">
  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
- <TabsList className="grid w-full grid-cols-2 h-auto p-1 bg-white/40 dark:bg-slate-900/40 rounded-xl gap-1 border border-slate-200/50 dark:border-slate-700/50">
+ <TabsList variant="nested">
  <TabsTrigger 
  value="summary" 
- className="data-[state=active]:bg-violet-100/80 dark:data-[state=active]:bg-violet-900/40 data-[state=active]:text-violet-700 dark:data-[state=active]:text-violet-300 py-2.5 rounded-lg text-sm font-medium"
+ variant="nested"
  >
  <FileText className="h-4 w-4 mr-1.5" />
  Özet & Takip
  </TabsTrigger>
  <TabsTrigger 
  value="assessment"
- className="data-[state=active]:bg-emerald-100/80 dark:data-[state=active]:bg-emerald-900/40 data-[state=active]:text-emerald-700 dark:data-[state=active]:text-emerald-300 py-2.5 rounded-lg text-sm font-medium"
+ variant="nested"
  >
  <ClipboardCheck className="h-4 w-4 mr-1.5" />
  Değerlendirme

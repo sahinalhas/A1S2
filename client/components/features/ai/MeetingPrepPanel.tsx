@@ -92,7 +92,7 @@ export default function MeetingPrepPanel({ selectedStudent, students = [] }: Mee
  variant="outline"
  size="sm"
  onClick={() => handleCopy(content, type)}
- className="gap-2"
+
  >
  {copiedType === type ? (
  <>
@@ -163,16 +163,16 @@ export default function MeetingPrepPanel({ selectedStudent, students = [] }: Mee
  )}
 
  <Tabs value={activeTab} onValueChange={setActiveTab}>
- <TabsList className="grid w-full grid-cols-3">
- <TabsTrigger value="parent" className="flex items-center gap-2">
+ <TabsList variant="nested">
+ <TabsTrigger value="parent" variant="nested">
  <Users className="h-4 w-4" />
  Veli Görüşmesi
  </TabsTrigger>
- <TabsTrigger value="intervention" className="flex items-center gap-2">
+ <TabsTrigger value="intervention" variant="nested">
  <Target className="h-4 w-4" />
  Müdahale Planı
  </TabsTrigger>
- <TabsTrigger value="teacher" className="flex items-center gap-2">
+ <TabsTrigger value="teacher" variant="nested">
  <UserCog className="h-4 w-4" />
  Öğretmen Toplantısı
  </TabsTrigger>
@@ -191,7 +191,7 @@ export default function MeetingPrepPanel({ selectedStudent, students = [] }: Mee
  <Button
  onClick={() => parentMeetingMutation.mutate()}
  disabled={parentMeetingMutation.isPending}
- className="gap-2"
+
  >
  {parentMeetingMutation.isPending ? (
  <>
@@ -243,7 +243,7 @@ export default function MeetingPrepPanel({ selectedStudent, students = [] }: Mee
  <Button
  onClick={() => interventionMutation.mutate()}
  disabled={interventionMutation.isPending || !focusArea}
- className="gap-2"
+
  >
  {interventionMutation.isPending ? (
  <>
@@ -288,7 +288,7 @@ export default function MeetingPrepPanel({ selectedStudent, students = [] }: Mee
  <Button
  onClick={() => teacherMeetingMutation.mutate()}
  disabled={teacherMeetingMutation.isPending}
- className="gap-2"
+
  >
  {teacherMeetingMutation.isPending ? (
  <>

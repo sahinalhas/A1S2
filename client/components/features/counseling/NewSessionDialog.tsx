@@ -110,17 +110,17 @@ export default function NewSessionDialog({
  {/* Session Type Tabs */}
  <div className="px-6 pt-4">
  <Tabs value={sessionType} onValueChange={(v) => onSessionTypeChange(v as 'individual' | 'group')}>
- <TabsList className="grid w-full grid-cols-2 h-11 bg-slate-50 dark:bg-slate-900 p-1 rounded-lg">
+ <TabsList variant="nested">
  <TabsTrigger 
  value="individual"
- className="data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]: rounded-md text-sm font-medium"
+ variant="nested"
  >
  <User className="h-4 w-4 mr-2" />
  Bireysel
  </TabsTrigger>
  <TabsTrigger 
  value="group"
- className="data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]: rounded-md text-sm font-medium"
+ variant="nested"
  >
  <Users className="h-4 w-4 mr-2" />
  Grup

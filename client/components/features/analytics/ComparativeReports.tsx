@@ -474,11 +474,11 @@ const ComparativeReports = React.memo(function ComparativeReports() {
  </p>
  </div>
  <div className="flex gap-2">
- <Button variant="outline" className="gap-2">
+ <Button variant="outline">
  <Filter className="h-4 w-4" />
  Filtrele
  </Button>
- <Button variant="outline" className="gap-2">
+ <Button variant="outline">
  <Download className="h-4 w-4" />
  Rapor İndir
  </Button>
@@ -518,10 +518,10 @@ const ComparativeReports = React.memo(function ComparativeReports() {
 
  <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
  <TabsList>
- <TabsTrigger value="demographic">Demografik Karşılaştırma</TabsTrigger>
- <TabsTrigger value="performance">Performans Metrikleri</TabsTrigger>
- <TabsTrigger value="benchmark">Benchmark Analizi</TabsTrigger>
- <TabsTrigger value="charts">Grafik Analizi</TabsTrigger>
+ <TabsTrigger value="demographic" variant="nested">Demografik Karşılaştırma</TabsTrigger>
+ <TabsTrigger value="performance" variant="nested">Performans Metrikleri</TabsTrigger>
+ <TabsTrigger value="benchmark" variant="nested">Benchmark Analizi</TabsTrigger>
+ <TabsTrigger value="charts" variant="nested">Grafik Analizi</TabsTrigger>
  </TabsList>
 
  <TabsContent value="demographic" className="space-y-4">

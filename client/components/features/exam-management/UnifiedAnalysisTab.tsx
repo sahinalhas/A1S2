@@ -44,16 +44,16 @@ export function UnifiedAnalysisTab({
  </CardHeader>
  <CardContent className="pt-6">
  <Tabs value={activeSubTab} onValueChange={setActiveSubTab}>
- <TabsList className="grid w-full grid-cols-3 mb-6">
- <TabsTrigger value="statistics" className="flex items-center gap-2">
+ <TabsList variant="nested">
+ <TabsTrigger value="statistics" variant="nested">
  <BarChart3 className="h-4 w-4" />
  İstatistikler
  </TabsTrigger>
- <TabsTrigger value="comparison" className="flex items-center gap-2">
+ <TabsTrigger value="comparison" variant="nested">
  <GitCompare className="h-4 w-4" />
  Karşılaştırma
  </TabsTrigger>
- <TabsTrigger value="trend" className="flex items-center gap-2">
+ <TabsTrigger value="trend" variant="nested">
  <TrendingUp className="h-4 w-4" />
  Trend Analizi
  </TabsTrigger>

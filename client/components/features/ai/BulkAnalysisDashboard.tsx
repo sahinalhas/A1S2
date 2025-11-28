@@ -134,10 +134,10 @@ export default function BulkAnalysisDashboard() {
  </Card>
 
  <Tabs defaultValue="overview" className="w-full">
- <TabsList className="grid w-full grid-cols-3">
- <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
- <TabsTrigger value="classes">Sınıflar</TabsTrigger>
- <TabsTrigger value="warnings">Erken Uyarılar</TabsTrigger>
+ <TabsList variant="nested">
+ <TabsTrigger value="overview" variant="nested">Genel Bakış</TabsTrigger>
+ <TabsTrigger value="classes" variant="nested">Sınıflar</TabsTrigger>
+ <TabsTrigger value="warnings" variant="nested">Erken Uyarılar</TabsTrigger>
  </TabsList>
 
  <TabsContent value="overview" className="space-y-4">

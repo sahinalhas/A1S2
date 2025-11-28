@@ -238,9 +238,9 @@ export default function SurveyTemplateEditDialog({
  </DialogHeader>
 
  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
- <TabsList className="grid w-full grid-cols-2">
- <TabsTrigger value="info">Temel Bilgiler</TabsTrigger>
- <TabsTrigger value="questions">
+ <TabsList variant="nested">
+ <TabsTrigger value="info" variant="nested">Temel Bilgiler</TabsTrigger>
+ <TabsTrigger value="questions" variant="nested">
  Sorular ({questions.length})
  </TabsTrigger>
  </TabsList>
@@ -347,7 +347,7 @@ export default function SurveyTemplateEditDialog({
  {field.value && field.value.length > 0 && (
  <div className="flex flex-wrap gap-2 mt-2">
  {field.value.map((tag) => (
- <Badge key={tag} variant="secondary" className="gap-1">
+ <Badge key={tag} variant="secondary">
  {tag}
  <Button
  type="button"

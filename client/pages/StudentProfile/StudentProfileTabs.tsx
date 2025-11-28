@@ -3,7 +3,7 @@
  * 6 Ana Sekme: Dashboard, Tanıtıcı Bilgiler, Akademik Durum, 
  * Psikososyal Durum, Kariyer Rehberliği, AI Araçları
  * 
- * Tarih: 21 Kasım 2025
+ * Minimalist Tab Tasarımı - Kasım 2025
  */
 
 import { useSearchParams } from "react-router-dom";
@@ -42,15 +42,15 @@ export function StudentProfileTabs({
   const defaultTab = (tabFromUrl || "overview") as string;
 
   return (
-    <Tabs defaultValue={defaultTab} className="space-y-4">
-      <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
+    <Tabs defaultValue={defaultTab} className="space-y-1">
+      <TabsList variant="minimal" className="w-full justify-start sm:justify-center">
         {STUDENT_PROFILE_MAIN_TABS.map((tabConfig) => {
           const Icon = tabConfig.icon;
           return (
             <TabsTrigger
               key={tabConfig.value}
               value={tabConfig.value}
-              className="gap-2"
+              variant="minimal"
               title={tabConfig.description}
             >
               {Icon && <Icon className="h-4 w-4" />}

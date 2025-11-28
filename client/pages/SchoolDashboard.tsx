@@ -159,16 +159,16 @@ export default function SchoolDashboard() {
  </StatsGrid>
  
  <Tabs defaultValue="overview" className="space-y-4">
- <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
- <TabsTrigger value="overview" className="gap-2">
+ <TabsList variant="minimal" className="w-full justify-start sm:justify-center">
+ <TabsTrigger value="overview" variant="minimal">
  <PieChartIcon className="h-4 w-4" />
  <span className="hidden sm:inline">Genel Bakış</span>
  </TabsTrigger>
- <TabsTrigger value="classes" className="gap-2">
+ <TabsTrigger value="classes" variant="minimal">
  <BarChart3 className="h-4 w-4" />
  <span className="hidden sm:inline">Sınıf Karşılaştırma</span>
  </TabsTrigger>
- <TabsTrigger value="trends" className="gap-2">
+ <TabsTrigger value="trends" variant="minimal">
  <TrendingUp className="h-4 w-4" />
  <span className="hidden sm:inline">Trend Analizi</span>
  </TabsTrigger>

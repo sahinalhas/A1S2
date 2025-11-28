@@ -75,16 +75,16 @@ export default function StudentExamResultsSection({ studentId }: StudentExamResu
  </Card>
 
  <Tabs defaultValue="deneme" className="space-y-4">
- <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
- <TabsTrigger value="deneme" className="gap-2">
+ <TabsList variant="nested">
+ <TabsTrigger value="deneme" variant="nested">
  <FileText className="h-4 w-4" />
  <span className="hidden sm:inline">Deneme Sınavları</span>
  </TabsTrigger>
- <TabsTrigger value="okul" className="gap-2">
+ <TabsTrigger value="okul" variant="nested">
  <GraduationCap className="h-4 w-4" />
  <span className="hidden sm:inline">Okul Notları</span>
  </TabsTrigger>
- <TabsTrigger value="analiz" className="gap-2">
+ <TabsTrigger value="analiz" variant="nested">
  <BarChart3 className="h-4 w-4" />
  <span className="hidden sm:inline">İstatistikler</span>
  </TabsTrigger>

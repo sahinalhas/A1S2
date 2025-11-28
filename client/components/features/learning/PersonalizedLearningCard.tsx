@@ -94,11 +94,11 @@ export function PersonalizedLearningCard({ studentId }: PersonalizedLearningCard
  </CardHeader>
  <CardContent className="space-y-6">
  <Tabs defaultValue="profile" className="w-full">
- <TabsList className="grid w-full grid-cols-4">
- <TabsTrigger value="profile">Profil</TabsTrigger>
- <TabsTrigger value="strengths">Güçlü Yönler</TabsTrigger>
- <TabsTrigger value="weaknesses">Gelişim Alanları</TabsTrigger>
- <TabsTrigger value="strategies">Stratejiler</TabsTrigger>
+ <TabsList variant="nested">
+ <TabsTrigger value="profile" variant="nested">Profil</TabsTrigger>
+ <TabsTrigger value="strengths" variant="nested">Güçlü Yönler</TabsTrigger>
+ <TabsTrigger value="weaknesses" variant="nested">Gelişim Alanları</TabsTrigger>
+ <TabsTrigger value="strategies" variant="nested">Stratejiler</TabsTrigger>
  </TabsList>
 
  <TabsContent value="profile" className="space-y-4 mt-4">

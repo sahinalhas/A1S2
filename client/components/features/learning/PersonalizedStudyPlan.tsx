@@ -114,12 +114,12 @@ export function PersonalizedStudyPlanComponent({ studentId }: PersonalizedStudyP
  </div>
 
  <Tabs defaultValue="goals" className="w-full">
- <TabsList className="grid w-full grid-cols-5">
- <TabsTrigger value="goals">Hedefler</TabsTrigger>
- <TabsTrigger value="schedule">Program</TabsTrigger>
- <TabsTrigger value="motivation">Motivasyon</TabsTrigger>
- <TabsTrigger value="resources">Kaynaklar</TabsTrigger>
- <TabsTrigger value="tracking">Takip</TabsTrigger>
+ <TabsList variant="nested">
+ <TabsTrigger value="goals" variant="nested">Hedefler</TabsTrigger>
+ <TabsTrigger value="schedule" variant="nested">Program</TabsTrigger>
+ <TabsTrigger value="motivation" variant="nested">Motivasyon</TabsTrigger>
+ <TabsTrigger value="resources" variant="nested">Kaynaklar</TabsTrigger>
+ <TabsTrigger value="tracking" variant="nested">Takip</TabsTrigger>
  </TabsList>
 
  <TabsContent value="goals" className="space-y-3 mt-4">

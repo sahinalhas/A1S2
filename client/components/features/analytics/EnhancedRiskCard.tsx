@@ -149,11 +149,11 @@ export function EnhancedRiskCard({ studentId }: EnhancedRiskCardProps) {
  </div>
 
  <Tabs defaultValue="factors" className="w-full">
- <TabsList className="grid w-full grid-cols-4">
- <TabsTrigger value="factors">Faktörler</TabsTrigger>
- <TabsTrigger value="predictions">Tahminler</TabsTrigger>
- <TabsTrigger value="risks">Riskler</TabsTrigger>
- <TabsTrigger value="protective">Koruyucular</TabsTrigger>
+ <TabsList variant="nested">
+ <TabsTrigger value="factors" variant="nested">Faktörler</TabsTrigger>
+ <TabsTrigger value="predictions" variant="nested">Tahminler</TabsTrigger>
+ <TabsTrigger value="risks" variant="nested">Riskler</TabsTrigger>
+ <TabsTrigger value="protective" variant="nested">Koruyucular</TabsTrigger>
  </TabsList>
 
  <TabsContent value="factors" className="space-y-3 mt-4">

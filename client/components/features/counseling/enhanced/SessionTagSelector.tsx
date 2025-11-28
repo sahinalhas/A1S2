@@ -148,9 +148,9 @@ export default function SessionTagSelector({
  )}
 
  <Tabs defaultValue="topic" className="w-full">
- <TabsList className="grid w-full grid-cols-5">
+ <TabsList variant="nested">
  {Object.entries(categoryLabels).map(([key, label]) => (
- <TabsTrigger key={key} value={key} className="text-xs">
+ <TabsTrigger key={key} value={key} variant="nested">
  {label}
  </TabsTrigger>
  ))}

@@ -114,11 +114,11 @@ export function AdvancedAnalyticsCard({ studentId }: AdvancedAnalyticsCardProps)
  </CardHeader>
  <CardContent className="space-y-6">
  <Tabs defaultValue="overview" className="w-full">
- <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
- <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
- <TabsTrigger value="performance">Performans</TabsTrigger>
- <TabsTrigger value="trends">Trendler</TabsTrigger>
- <TabsTrigger value="comparison">Karşılaştırma</TabsTrigger>
+ <TabsList variant="nested">
+ <TabsTrigger value="overview" variant="nested">Genel Bakış</TabsTrigger>
+ <TabsTrigger value="performance" variant="nested">Performans</TabsTrigger>
+ <TabsTrigger value="trends" variant="nested">Trendler</TabsTrigger>
+ <TabsTrigger value="comparison" variant="nested">Karşılaştırma</TabsTrigger>
  </TabsList>
 
  <TabsContent value="overview" className="space-y-4 mt-4">

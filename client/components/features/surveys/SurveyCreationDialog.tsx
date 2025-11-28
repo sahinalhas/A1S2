@@ -122,12 +122,12 @@ export default function SurveyCreationDialog({
  <Form {...form}>
  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
  <Tabs value={currentStep} onValueChange={(value) => setCurrentStep(value as"template" |"questions")}>
- <TabsList className="grid w-full grid-cols-2">
- <TabsTrigger value="template" disabled={isLoading}>
+ <TabsList variant="nested">
+ <TabsTrigger value="template" variant="nested" disabled={isLoading}>
  <Settings className="mr-2 h-4 w-4" />
  Temel Bilgiler
  </TabsTrigger>
- <TabsTrigger value="questions" disabled={isLoading}>
+ <TabsTrigger value="questions" variant="nested" disabled={isLoading}>
  <FileText className="mr-2 h-4 w-4" />
  Sorular
  </TabsTrigger>

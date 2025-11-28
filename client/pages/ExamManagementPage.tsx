@@ -316,28 +316,28 @@ export default function ExamManagementPage() {
  transition={{ duration: 0.3 }}
  >
  <Tabs value={activeTab} onValueChange={setActiveTab}>
- <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
- <TabsTrigger value="overview" className="gap-2">
+ <TabsList variant="minimal" className="w-full justify-start sm:justify-center">
+ <TabsTrigger value="overview" variant="minimal">
  <BarChart3 className="h-4 w-4" />
  <span className="hidden sm:inline">Genel Bakış</span>
  </TabsTrigger>
- <TabsTrigger value="practice-exams" className="gap-2">
+ <TabsTrigger value="practice-exams" variant="minimal">
  <FileText className="h-4 w-4" />
  <span className="hidden sm:inline">Denemeler</span>
  </TabsTrigger>
- <TabsTrigger value="school-exams" className="gap-2">
+ <TabsTrigger value="school-exams" variant="minimal">
  <BookOpen className="h-4 w-4" />
  <span className="hidden sm:inline">Okul Sınavları</span>
  </TabsTrigger>
- <TabsTrigger value="analysis" className="gap-2">
+ <TabsTrigger value="analysis" variant="minimal">
  <TrendingUp className="h-4 w-4" />
  <span className="hidden sm:inline">Analizler</span>
  </TabsTrigger>
- <TabsTrigger value="advanced" className="gap-2">
+ <TabsTrigger value="advanced" variant="minimal">
  <BarChart3 className="h-4 w-4" />
  <span className="hidden sm:inline">Gelişmiş Analitik</span>
  </TabsTrigger>
- <TabsTrigger value="student-dashboard" className="gap-2">
+ <TabsTrigger value="student-dashboard" variant="minimal">
  <User className="h-4 w-4" />
  <span className="hidden sm:inline">Öğrenci Panosu</span>
  </TabsTrigger>

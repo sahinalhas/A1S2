@@ -564,7 +564,7 @@ export default function ProgressCharts() {
  Öğrenci ilerlemesinin görsel takibi ve analizi
  </p>
  </div>
- <Button variant="outline" className="gap-2">
+ <Button variant="outline">
  <Download className="h-4 w-4" />
  Rapor İndir
  </Button>
@@ -594,10 +594,10 @@ export default function ProgressCharts() {
  {selectedStudent && (
  <Tabs defaultValue="overview" className="space-y-4">
  <TabsList>
- <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
- <TabsTrigger value="mastery">Konu Ustalığı</TabsTrigger>
- <TabsTrigger value="timeline">Zaman Çizelgesi</TabsTrigger>
- <TabsTrigger value="trends">Trend Analizi</TabsTrigger>
+ <TabsTrigger value="overview" variant="nested">Genel Bakış</TabsTrigger>
+ <TabsTrigger value="mastery" variant="nested">Konu Ustalığı</TabsTrigger>
+ <TabsTrigger value="timeline" variant="nested">Zaman Çizelgesi</TabsTrigger>
+ <TabsTrigger value="trends" variant="nested">Trend Analizi</TabsTrigger>
  </TabsList>
 
  <TabsContent value="overview" className="space-y-4">

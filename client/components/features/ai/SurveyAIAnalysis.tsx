@@ -231,11 +231,11 @@ export default function SurveyAIAnalysis({ distributionId }: SurveyAIAnalysisPro
  </Card>
 
  <Tabs defaultValue="findings" className="w-full">
- <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
- <TabsTrigger value="findings">Ana Bulgular</TabsTrigger>
- <TabsTrigger value="trends">Trendler</TabsTrigger>
- <TabsTrigger value="insights">İçgörüler</TabsTrigger>
- <TabsTrigger value="recommendations">Öneriler</TabsTrigger>
+ <TabsList variant="nested">
+ <TabsTrigger value="findings" variant="nested">Ana Bulgular</TabsTrigger>
+ <TabsTrigger value="trends" variant="nested">Trendler</TabsTrigger>
+ <TabsTrigger value="insights" variant="nested">İçgörüler</TabsTrigger>
+ <TabsTrigger value="recommendations" variant="nested">Öneriler</TabsTrigger>
  </TabsList>
 
  <TabsContent value="findings" className="space-y-4">

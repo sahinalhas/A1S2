@@ -369,16 +369,16 @@ export default function SurveyDistributionDialog({
  <Form {...form}>
  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
  <Tabs value={currentStep} onValueChange={(value) => setCurrentStep(value as any)}>
- <TabsList className="grid w-full grid-cols-3">
- <TabsTrigger value="basic">
+ <TabsList variant="nested">
+ <TabsTrigger value="basic" variant="nested">
  <Settings className="mr-2 h-4 w-4" />
  Temel Bilgiler
  </TabsTrigger>
- <TabsTrigger value="selection">
+ <TabsTrigger value="selection" variant="nested">
  <Users className="mr-2 h-4 w-4" />
  Sınıf/Öğrenci Seçimi
  </TabsTrigger>
- <TabsTrigger value="config">
+ <TabsTrigger value="config" variant="nested">
  <FileSpreadsheet className="mr-2 h-4 w-4" />
  Dağıtım Yapılandırması
  </TabsTrigger>

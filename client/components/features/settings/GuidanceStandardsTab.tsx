@@ -484,7 +484,7 @@ export default function GuidanceStandardsTab() {
       </CardDescription>
      </div>
      <div className="flex items-center gap-2">
-      <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+      <Button variant="outline" size="sm" onClick={handleExport}>
        <Download className="h-4 w-4" />
        Dışa Aktar
       </Button>
@@ -503,7 +503,7 @@ export default function GuidanceStandardsTab() {
        className="hidden"
        onChange={handleImport}
       />
-      <Button variant="outline" size="sm" onClick={() => setResetDialogOpen(true)} className="gap-2">
+      <Button variant="outline" size="sm" onClick={() => setResetDialogOpen(true)}>
        <RotateCcw className="h-4 w-4" />
        Varsayılana Sıfırla
       </Button>
@@ -513,12 +513,12 @@ export default function GuidanceStandardsTab() {
    <CardContent>
 
     <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'individual' | 'group')}>
-     <TabsList className="grid w-full grid-cols-2 bg-muted/50">
-      <TabsTrigger value="individual" className="gap-2">
+     <TabsList variant="nested">
+      <TabsTrigger value="individual" variant="nested">
        <User className="h-4 w-4" />
        Bireysel Çalışmalar
       </TabsTrigger>
-      <TabsTrigger value="group" className="gap-2">
+      <TabsTrigger value="group" variant="nested">
        <Users className="h-4 w-4" />
        Grup Çalışmaları
       </TabsTrigger>

@@ -531,15 +531,15 @@ export function InterventionPlanCard({ warning }: { warning: EarlyWarning }) {
  </div>
 
  <div className="flex gap-2 pt-4">
- <Button size="sm" className="gap-2">
+ <Button size="sm">
  <Mail className="h-3 w-3" />
  Veli Bilgilendir
  </Button>
- <Button size="sm" variant="outline" className="gap-2">
+ <Button size="sm" variant="outline">
  <Phone className="h-3 w-3" />
  Uzman Ara
  </Button>
- <Button size="sm" variant="outline" className="gap-2">
+ <Button size="sm" variant="outline">
  <Calendar className="h-3 w-3" />
  Takip Randevusu
  </Button>
@@ -659,7 +659,7 @@ const EarlyWarningSystem = React.memo(function EarlyWarningSystem() {
  <div className="flex gap-2">
  <Button 
  variant="default" 
- className="gap-2"
+
  onClick={handleAutoIntervention}
  disabled={isCreatingInterventions}
  >
@@ -670,11 +670,11 @@ const EarlyWarningSystem = React.memo(function EarlyWarningSystem() {
  )}
  Otomatik Müdahale Oluştur
  </Button>
- <Button variant="outline" className="gap-2">
+ <Button variant="outline">
  <Filter className="h-4 w-4" />
  Filtrele
  </Button>
- <Button variant="outline" className="gap-2">
+ <Button variant="outline">
  <Download className="h-4 w-4" />
  Rapor İndir
  </Button>
@@ -714,9 +714,9 @@ const EarlyWarningSystem = React.memo(function EarlyWarningSystem() {
 
  <Tabs defaultValue="overview" className="space-y-4">
  <TabsList>
- <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
- <TabsTrigger value="warnings">Uyarılar ({warnings.length})</TabsTrigger>
- <TabsTrigger value="profiles">Risk Profilleri ({riskProfiles.length})</TabsTrigger>
+ <TabsTrigger value="overview" variant="nested">Genel Bakış</TabsTrigger>
+ <TabsTrigger value="warnings" variant="nested">Uyarılar ({warnings.length})</TabsTrigger>
+ <TabsTrigger value="profiles" variant="nested">Risk Profilleri ({riskProfiles.length})</TabsTrigger>
  </TabsList>
 
  <TabsContent value="overview" className="space-y-4">

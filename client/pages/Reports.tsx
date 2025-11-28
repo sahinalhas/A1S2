@@ -168,7 +168,7 @@ function OverviewDashboard({ setActiveTab }: { setActiveTab: (tab: string) => vo
     const total = reportsData?.topWarnings.length || 0;
     const critical = reportsData?.topWarnings.filter(w => w.severity === "kritik").length || 0;
     const high = reportsData?.topWarnings.filter(w => w.severity === "yüksek").length || 0;
-    const highRisk = reportsData?.riskDistribution?.yüksek + reportsData?.riskDistribution?.kritik || 0;
+    const highRisk = (reportsData?.riskDistribution?.yüksek ?? 0) + (reportsData?.riskDistribution?.kritik ?? 0);
 
     return { total, critical, high, highRisk };
   }, [reportsData]);
@@ -644,32 +644,32 @@ export default function Reports() {
  transition={{ duration: 0.3 }}
  >
  <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
- <TabsList className="grid w-full grid-cols-3 md:grid-cols-4 lg:grid-cols-7 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
- <TabsTrigger value="overview" className="gap-2">
+ <TabsList variant="minimal" className="w-full justify-start sm:justify-center">
+ <TabsTrigger value="overview" variant="minimal">
  <PieChart className="h-4 w-4" />
  <span className="hidden sm:inline">Genel Bakış</span>
  </TabsTrigger>
- <TabsTrigger value="predictive" className="gap-2">
+ <TabsTrigger value="predictive" variant="minimal">
  <TrendingUp className="h-4 w-4" />
  <span className="hidden sm:inline">Prediktif</span>
  </TabsTrigger>
- <TabsTrigger value="comparative" className="gap-2">
+ <TabsTrigger value="comparative" variant="minimal">
  <BarChart3 className="h-4 w-4" />
  <span className="hidden sm:inline">Karşılaştırmalı</span>
  </TabsTrigger>
- <TabsTrigger value="progress" className="gap-2">
+ <TabsTrigger value="progress" variant="minimal">
  <LineChart className="h-4 w-4" />
  <span className="hidden sm:inline">İlerleme</span>
  </TabsTrigger>
- <TabsTrigger value="warnings" className="gap-2">
+ <TabsTrigger value="warnings" variant="minimal">
  <AlertTriangle className="h-4 w-4" />
  <span className="hidden sm:inline">Erken Uyarı</span>
  </TabsTrigger>
- <TabsTrigger value="ai-analysis" className="gap-2">
+ <TabsTrigger value="ai-analysis" variant="minimal">
  <Brain className="h-4 w-4" />
  <span className="hidden sm:inline">AI Analiz</span>
  </TabsTrigger>
- <TabsTrigger value="settings" className="gap-2">
+ <TabsTrigger value="settings" variant="minimal">
  <Settings className="h-4 w-4" />
  <span className="hidden sm:inline">Ayarlar</span>
  </TabsTrigger>

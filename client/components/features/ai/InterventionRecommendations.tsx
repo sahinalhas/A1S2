@@ -96,10 +96,10 @@ export default function InterventionRecommendations({ studentId, studentName }: 
  </Card>
 
  <Tabs defaultValue="recommendations" className="w-full">
- <TabsList className="grid w-full grid-cols-3">
- <TabsTrigger value="recommendations">Öneriler</TabsTrigger>
- <TabsTrigger value="action-plan">Eylem Planı</TabsTrigger>
- <TabsTrigger value="monitoring">İzleme</TabsTrigger>
+ <TabsList variant="nested">
+ <TabsTrigger value="recommendations" variant="nested">Öneriler</TabsTrigger>
+ <TabsTrigger value="action-plan" variant="nested">Eylem Planı</TabsTrigger>
+ <TabsTrigger value="monitoring" variant="nested">İzleme</TabsTrigger>
  </TabsList>
 
  <TabsContent value="recommendations" className="space-y-4">
