@@ -46,7 +46,7 @@ export function convertSessionToAIFormat(session: CounselingSession): AIReadySes
     session: {
       id: session.id,
       date: session.sessionDate,
-      topic: session.topic,
+      topic: session.topic || '',
       duration,
       sessionType: session.sessionType
     },
@@ -130,7 +130,7 @@ Follow-up Needed: ${sessionData.actions.followUpNeeded ? 'Yes' : 'No'}
 ${sessionData.actions.followUpPlan ? `Follow-up Plan: ${sessionData.actions.followUpPlan}` : ''}
 
 Action Items:
-${sessionData.actions.actionItems.map(item => `- ${item.description}`).join('\n') || 'None'}
+${sessionData.actions.actionItems.map((item: any) => `- ${item.description || item}`).join('\n') || 'None'}
 
 Please provide:
 1. A brief analysis of the student's progress

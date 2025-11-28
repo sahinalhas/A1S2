@@ -141,15 +141,27 @@ async function analyzeStudentTrajectory(studentId: string): Promise<StudentTraje
   };
   
   // Tahmin
-  const prediction = {
+  const prediction: StudentTrajectory['prediction'] = {
     nextMonthOutlook: trend === 'YÜKSELİŞ' ? 'İYİLEŞME' : trend === 'DÜŞÜŞ' ? 'RİSK_ARTIŞI' : 'STABIL',
     confidence: 75,
     factors: [
       trend === 'YÜKSELİŞ' ? 'Pozitif akademik trend' : 'Akademik zorluklar',
       behaviors.length > 5 ? 'Davranışsal zorluklar' : 'Davranışsal istikrar'
-    ],
-    recommendedInterventions: riskAnalysis.recommendations.slice(0, 3).map(r => r.title)
+    ]
   };
+  
+  // Müdahale önceliği belirle
+  let interventionPriority: StudentTrajectory['interventionPriority'] = 'DÜŞÜK';
+  if (riskAnalysis.riskLevel === 'KRİTİK') {
+    interventionPriority = 'ACİL';
+  } else if (riskAnalysis.riskLevel === 'YÜKSEK') {
+    interventionPriority = 'YÜKSEK';
+  } else if (riskAnalysis.riskLevel === 'ORTA') {
+    interventionPriority = 'ORTA';
+  }
+  
+  // Önerilen aksiyonlar
+  const recommendedActions = riskAnalysis.recommendations.slice(0, 5).map(r => r.title);
   
   return {
     studentId,
@@ -160,7 +172,9 @@ async function analyzeStudentTrajectory(studentId: string): Promise<StudentTraje
       trendPercentage,
       keyTurningPoints
     },
-    prediction: prediction as any
+    prediction,
+    interventionPriority,
+    recommendedActions
   };
 }
 

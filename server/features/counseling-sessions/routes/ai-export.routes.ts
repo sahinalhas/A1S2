@@ -4,9 +4,11 @@ import {
   generateAIAnalysisPrompt, 
   aggregateSessionDataForStudent 
 } from '../services/ai-export.service.js';
+import type { SchoolScopedRequest } from '../../../middleware/school-access.middleware.js';
 
 export function exportForAI(req: Request, res: Response) {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
     const { sessionIds } = req.query;
     
     let ids: string[] | undefined;
@@ -14,7 +16,7 @@ export function exportForAI(req: Request, res: Response) {
       ids = Array.isArray(sessionIds) ? sessionIds as string[] : [sessionIds as string];
     }
 
-    const aiReadyData = exportSessionsForAI(ids);
+    const aiReadyData = exportSessionsForAI(schoolId, ids);
     
     res.json({
       format: 'ai-ready',
@@ -31,13 +33,14 @@ export function exportForAI(req: Request, res: Response) {
 
 export function generatePrompt(req: Request, res: Response) {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
     const { sessionId } = req.params;
     
     if (!sessionId) {
       return res.status(400).json({ error: 'Görüşme ID gereklidir' });
     }
 
-    const sessionData = exportSessionsForAI([sessionId])[0];
+    const sessionData = exportSessionsForAI(schoolId, [sessionId])[0];
     
     if (!sessionData) {
       return res.status(404).json({ error: 'Görüşme bulunamadı' });
@@ -58,13 +61,14 @@ export function generatePrompt(req: Request, res: Response) {
 
 export function getStudentAggregation(req: Request, res: Response) {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
     const { studentId } = req.params;
     
     if (!studentId) {
       return res.status(400).json({ error: 'Öğrenci ID gereklidir' });
     }
 
-    const aggregation = aggregateSessionDataForStudent(studentId);
+    const aggregation = aggregateSessionDataForStudent(studentId, schoolId);
     
     res.json({
       studentId,
