@@ -22,27 +22,29 @@ export class AdvancedReportsService {
     this.aiProvider = AIProviderService.getInstance();
   }
   
-  async getSchoolStatistics(): Promise<SchoolStatistics> {
-    return schoolStatsRepo.getSchoolStatistics();
+  async getSchoolStatistics(schoolId: string): Promise<SchoolStatistics> {
+    return schoolStatsRepo.getSchoolStatistics(schoolId);
   }
   
-  async getClassComparisons(classNames?: string[]): Promise<ClassComparison[]> {
-    return classComparisonRepo.getClassComparisons(classNames);
+  async getClassComparisons(schoolId: string, classNames?: string[]): Promise<ClassComparison[]> {
+    return classComparisonRepo.getClassComparisons(schoolId, classNames);
   }
   
-  async compareClasses(className1: string, className2: string) {
-    return classComparisonRepo.compareClasses(className1, className2);
+  async compareClasses(schoolId: string, className1: string, className2: string) {
+    return classComparisonRepo.compareClasses(schoolId, className1, className2);
   }
   
   async getTrendAnalysis(
+    schoolId: string,
     period: 'daily' | 'weekly' | 'monthly',
     startDate?: string,
     endDate?: string
   ): Promise<TimeSeriesAnalysis> {
-    return trendAnalysisRepo.analyzeTimeSeries(period, startDate, endDate);
+    return trendAnalysisRepo.analyzeTimeSeries(schoolId, period, startDate, endDate);
   }
   
   async generateComprehensiveReport(
+    schoolId: string,
     generatedBy: string,
     options?: {
       includeAIAnalysis?: boolean;
@@ -52,9 +54,10 @@ export class AdvancedReportsService {
       endDate?: string;
     }
   ): Promise<ComprehensiveReport> {
-    const schoolStats = await this.getSchoolStatistics();
-    const classComparisons = await this.getClassComparisons(options?.classNames);
+    const schoolStats = await this.getSchoolStatistics(schoolId);
+    const classComparisons = await this.getClassComparisons(schoolId, options?.classNames);
     const timeSeriesAnalysis = await this.getTrendAnalysis(
+      schoolId,
       options?.period || 'monthly',
       options?.startDate,
       options?.endDate
@@ -247,8 +250,8 @@ Lütfen bu verileri analiz ederek şu formatta yanıt ver:
     return items;
   }
   
-  getAvailableClasses(): string[] {
-    return schoolStatsRepo.getClassList();
+  getAvailableClasses(schoolId: string): string[] {
+    return schoolStatsRepo.getClassList(schoolId);
   }
 }
 

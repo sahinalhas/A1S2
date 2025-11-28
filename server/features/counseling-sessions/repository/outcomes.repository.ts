@@ -15,13 +15,37 @@ function ensureInitialized(): void {
       SELECT * FROM counseling_outcomes 
       ORDER BY created_at DESC
     `),
+    getAllOutcomesBySchool: db.prepare(`
+      SELECT co.* FROM counseling_outcomes co
+      INNER JOIN counseling_sessions cs ON co.sessionId = cs.id
+      WHERE cs.schoolId = ?
+      ORDER BY co.created_at DESC
+    `),
     getOutcomeById: db.prepare('SELECT * FROM counseling_outcomes WHERE id = ?'),
+    getOutcomeByIdAndSchool: db.prepare(`
+      SELECT co.* FROM counseling_outcomes co
+      INNER JOIN counseling_sessions cs ON co.sessionId = cs.id
+      WHERE co.id = ? AND cs.schoolId = ?
+    `),
     getOutcomeBySessionId: db.prepare('SELECT * FROM counseling_outcomes WHERE sessionId = ?'),
+    getOutcomeBySessionIdAndSchool: db.prepare(`
+      SELECT co.* FROM counseling_outcomes co
+      INNER JOIN counseling_sessions cs ON co.sessionId = cs.id
+      WHERE co.sessionId = ? AND cs.schoolId = ?
+    `),
     getOutcomesRequiringFollowUp: db.prepare(`
       SELECT * FROM counseling_outcomes 
       WHERE followUpRequired = 1 
       AND (followUpDate IS NULL OR followUpDate <= ?)
       ORDER BY followUpDate ASC
+    `),
+    getOutcomesRequiringFollowUpBySchool: db.prepare(`
+      SELECT co.* FROM counseling_outcomes co
+      INNER JOIN counseling_sessions cs ON co.sessionId = cs.id
+      WHERE co.followUpRequired = 1 
+      AND (co.followUpDate IS NULL OR co.followUpDate <= ?)
+      AND cs.schoolId = ?
+      ORDER BY co.followUpDate ASC
     `),
     getOutcomesByRating: db.prepare(`
       SELECT * FROM counseling_outcomes 
@@ -42,11 +66,20 @@ function ensureInitialized(): void {
           followUpDate = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `),
+    updateOutcomeBySchool: db.prepare(`
+      UPDATE counseling_outcomes 
+      SET effectivenessRating = ?, progressNotes = ?, goalsAchieved = ?,
+          nextSteps = ?, recommendations = ?, followUpRequired = ?, 
+          followUpDate = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND sessionId IN (
+        SELECT id FROM counseling_sessions WHERE schoolId = ?
+      )
+    `),
     deleteOutcome: db.prepare('DELETE FROM counseling_outcomes WHERE id = ?'),
     deleteOutcomeBySchool: db.prepare(`
       DELETE FROM counseling_outcomes 
       WHERE id = ? AND sessionId IN (
-        SELECT id FROM counseling_sessions WHERE school_id = ?
+        SELECT id FROM counseling_sessions WHERE schoolId = ?
       )
     `)
   };
@@ -59,9 +92,19 @@ export function getAllOutcomes(): CounselingOutcome[] {
   return statements!.getAllOutcomes.all() as CounselingOutcome[];
 }
 
+export function getAllOutcomesBySchool(schoolId: string): CounselingOutcome[] {
+  ensureInitialized();
+  return statements!.getAllOutcomesBySchool.all(schoolId) as CounselingOutcome[];
+}
+
 export function getOutcomeById(id: string): CounselingOutcome | null {
   ensureInitialized();
   return statements!.getOutcomeById.get(id) as CounselingOutcome | null;
+}
+
+export function getOutcomeByIdAndSchool(id: string, schoolId: string): CounselingOutcome | null {
+  ensureInitialized();
+  return statements!.getOutcomeByIdAndSchool.get(id, schoolId) as CounselingOutcome | null;
 }
 
 export function getOutcomeBySessionId(sessionId: string): CounselingOutcome | null {
@@ -69,9 +112,19 @@ export function getOutcomeBySessionId(sessionId: string): CounselingOutcome | nu
   return statements!.getOutcomeBySessionId.get(sessionId) as CounselingOutcome | null;
 }
 
+export function getOutcomeBySessionIdAndSchool(sessionId: string, schoolId: string): CounselingOutcome | null {
+  ensureInitialized();
+  return statements!.getOutcomeBySessionIdAndSchool.get(sessionId, schoolId) as CounselingOutcome | null;
+}
+
 export function getOutcomesRequiringFollowUp(currentDate: string): CounselingOutcome[] {
   ensureInitialized();
   return statements!.getOutcomesRequiringFollowUp.all(currentDate) as CounselingOutcome[];
+}
+
+export function getOutcomesRequiringFollowUpBySchool(currentDate: string, schoolId: string): CounselingOutcome[] {
+  ensureInitialized();
+  return statements!.getOutcomesRequiringFollowUpBySchool.all(currentDate, schoolId) as CounselingOutcome[];
 }
 
 export function getOutcomesByRating(rating: number): CounselingOutcome[] {

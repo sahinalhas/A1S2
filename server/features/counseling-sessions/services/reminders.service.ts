@@ -6,9 +6,18 @@ export function getAllReminders(): CounselingReminder[] {
   return repository.getAllReminders();
 }
 
+export function getAllRemindersBySchool(schoolId: string): CounselingReminder[] {
+  return repository.getAllRemindersBySchool(schoolId);
+}
+
 export function getReminderById(id: string): CounselingReminder | null {
   const sanitizedId = sanitizeString(id);
   return repository.getReminderById(sanitizedId);
+}
+
+export function getReminderByIdAndSchool(id: string, schoolId: string): CounselingReminder | null {
+  const sanitizedId = sanitizeString(id);
+  return repository.getReminderByIdAndSchool(sanitizedId, schoolId);
 }
 
 export function getRemindersBySessionId(sessionId: string): CounselingReminder[] {
@@ -16,14 +25,29 @@ export function getRemindersBySessionId(sessionId: string): CounselingReminder[]
   return repository.getRemindersBySessionId(sanitizedId);
 }
 
+export function getRemindersBySessionIdAndSchool(sessionId: string, schoolId: string): CounselingReminder[] {
+  const sanitizedId = sanitizeString(sessionId);
+  return repository.getRemindersBySessionIdAndSchool(sanitizedId, schoolId);
+}
+
 export function getRemindersByStatus(status: string): CounselingReminder[] {
   const sanitizedStatus = sanitizeString(status);
   return repository.getRemindersByStatus(sanitizedStatus);
 }
 
+export function getRemindersByStatusAndSchool(status: string, schoolId: string): CounselingReminder[] {
+  const sanitizedStatus = sanitizeString(status);
+  return repository.getRemindersByStatusAndSchool(sanitizedStatus, schoolId);
+}
+
 export function getPendingReminders(): CounselingReminder[] {
   const currentDate = new Date().toISOString().split('T')[0];
   return repository.getPendingReminders(currentDate);
+}
+
+export function getPendingRemindersBySchool(schoolId: string): CounselingReminder[] {
+  const currentDate = new Date().toISOString().split('T')[0];
+  return repository.getPendingRemindersBySchool(currentDate, schoolId);
 }
 
 export function createReminder(data: any): { success: boolean; id: string } {
@@ -87,6 +111,19 @@ export function updateReminderStatus(id: string, status: string): { success: boo
   return { success: true };
 }
 
+export function updateReminderStatusBySchool(id: string, status: string, schoolId: string): { success: boolean; notFound?: boolean } {
+  const sanitizedId = sanitizeString(id);
+  const sanitizedStatus = sanitizeString(status);
+  
+  const result = repository.updateReminderStatusBySchool(sanitizedId, sanitizedStatus, schoolId);
+  
+  if (result.changes === 0) {
+    return { success: false, notFound: true };
+  }
+  
+  return { success: true };
+}
+
 export function markNotificationSent(id: string): { success: boolean; notFound?: boolean } {
   const sanitizedId = sanitizeString(id);
   
@@ -103,6 +140,18 @@ export function deleteReminder(id: string): { success: boolean; notFound?: boole
   const sanitizedId = sanitizeString(id);
   
   const result = repository.deleteReminder(sanitizedId);
+  
+  if (result.changes === 0) {
+    return { success: false, notFound: true };
+  }
+  
+  return { success: true };
+}
+
+export function deleteReminderBySchool(id: string, schoolId: string): { success: boolean; notFound?: boolean } {
+  const sanitizedId = sanitizeString(id);
+  
+  const result = repository.deleteReminder(sanitizedId, schoolId);
   
   if (result.changes === 0) {
     return { success: false, notFound: true };

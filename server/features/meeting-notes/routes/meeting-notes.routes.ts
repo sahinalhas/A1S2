@@ -1,8 +1,11 @@
 import { RequestHandler } from 'express';
 import * as meetingNotesService from '../services/meeting-notes.service.js';
+import type { SchoolScopedRequest } from '../../../middleware/school-access.middleware.js';
+import * as studentsRepository from '../../students/repository/students.repository.js';
 
 export const getMeetingNotes: RequestHandler = (req, res) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId } = req.params;
     
     if (!studentId || typeof studentId !== 'string' || studentId.length > 50) {
@@ -10,6 +13,16 @@ export const getMeetingNotes: RequestHandler = (req, res) => {
         success: false, 
         error: "Geçersiz öğrenci ID" 
       });
+    }
+    
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          error: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
     }
     
     const notes = meetingNotesService.getStudentMeetingNotes(studentId);
@@ -31,7 +44,18 @@ export const getMeetingNotes: RequestHandler = (req, res) => {
 
 export const saveMeetingNoteHandler: RequestHandler = (req, res) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const note = req.body;
+    
+    if (schoolId && note.studentId) {
+      const student = studentsRepository.getStudentByIdAndSchool(note.studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          error: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
+    }
     
     meetingNotesService.createMeetingNote(note);
     
@@ -56,6 +80,7 @@ export const saveMeetingNoteHandler: RequestHandler = (req, res) => {
 
 export const updateMeetingNoteHandler: RequestHandler = (req, res) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { id } = req.params;
     const note = req.body;
     
@@ -64,6 +89,25 @@ export const updateMeetingNoteHandler: RequestHandler = (req, res) => {
         success: false, 
         error: "Geçersiz not ID" 
       });
+    }
+    
+    if (schoolId) {
+      const existingNote = meetingNotesService.getMeetingNoteById(id);
+      if (!existingNote) {
+        return res.status(404).json({
+          success: false,
+          error: 'Görüşme notu bulunamadı'
+        });
+      }
+      if (existingNote.studentId) {
+        const student = studentsRepository.getStudentByIdAndSchool(existingNote.studentId, schoolId);
+        if (!student) {
+          return res.status(403).json({
+            success: false,
+            error: 'Bu öğrenciye ait notu güncelleme izniniz yok'
+          });
+        }
+      }
     }
     
     meetingNotesService.modifyMeetingNote(id, note);
@@ -89,6 +133,7 @@ export const updateMeetingNoteHandler: RequestHandler = (req, res) => {
 
 export const deleteMeetingNoteHandler: RequestHandler = (req, res) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { id } = req.params;
     
     if (!id || typeof id !== 'string' || id.length > 50) {
@@ -96,6 +141,19 @@ export const deleteMeetingNoteHandler: RequestHandler = (req, res) => {
         success: false, 
         error: "Geçersiz not ID" 
       });
+    }
+    
+    if (schoolId) {
+      const existingNote = meetingNotesService.getMeetingNoteById(id);
+      if (existingNote && existingNote.studentId) {
+        const student = studentsRepository.getStudentByIdAndSchool(existingNote.studentId, schoolId);
+        if (!student) {
+          return res.status(403).json({
+            success: false,
+            error: 'Bu öğrenciye ait notu silme izniniz yok'
+          });
+        }
+      }
     }
     
     meetingNotesService.removeMeetingNote(id);

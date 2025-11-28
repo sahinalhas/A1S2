@@ -161,6 +161,14 @@ export class CareerGuidanceService {
   }
 
   /**
+   * Get Roadmap By ID
+   * ID'ye Göre Yol Haritasını Getir
+   */
+  getRoadmapById(roadmapId: string): CareerRoadmap | null {
+    return this.roadmapRepo.getRoadmapById(roadmapId);
+  }
+
+  /**
    * Update Roadmap Progress
    * Yol Haritası İlerlemesini Güncelle
    */
@@ -172,7 +180,7 @@ export class CareerGuidanceService {
    * Delete Roadmap
    * Yol Haritasını Sil
    */
-  deleteRoadmap(roadmapId: string): void {
+  deleteRoadmap(roadmapId: string, schoolId?: string): void {
     this.roadmapRepo.deleteRoadmap(roadmapId);
   }
 

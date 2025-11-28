@@ -6,9 +6,18 @@ export function getAllOutcomes(): CounselingOutcome[] {
   return repository.getAllOutcomes();
 }
 
+export function getAllOutcomesBySchool(schoolId: string): CounselingOutcome[] {
+  return repository.getAllOutcomesBySchool(schoolId);
+}
+
 export function getOutcomeById(id: string): CounselingOutcome | null {
   const sanitizedId = sanitizeString(id);
   return repository.getOutcomeById(sanitizedId);
+}
+
+export function getOutcomeByIdAndSchool(id: string, schoolId: string): CounselingOutcome | null {
+  const sanitizedId = sanitizeString(id);
+  return repository.getOutcomeByIdAndSchool(sanitizedId, schoolId);
 }
 
 export function getOutcomeBySessionId(sessionId: string): CounselingOutcome | null {
@@ -16,9 +25,19 @@ export function getOutcomeBySessionId(sessionId: string): CounselingOutcome | nu
   return repository.getOutcomeBySessionId(sanitizedSessionId);
 }
 
+export function getOutcomeBySessionIdAndSchool(sessionId: string, schoolId: string): CounselingOutcome | null {
+  const sanitizedSessionId = sanitizeString(sessionId);
+  return repository.getOutcomeBySessionIdAndSchool(sanitizedSessionId, schoolId);
+}
+
 export function getOutcomesRequiringFollowUp(): CounselingOutcome[] {
   const currentDate = new Date().toISOString().split('T')[0];
   return repository.getOutcomesRequiringFollowUp(currentDate);
+}
+
+export function getOutcomesRequiringFollowUpBySchool(schoolId: string): CounselingOutcome[] {
+  const currentDate = new Date().toISOString().split('T')[0];
+  return repository.getOutcomesRequiringFollowUpBySchool(currentDate, schoolId);
 }
 
 export function getOutcomesByRating(rating: number): CounselingOutcome[] {
@@ -90,6 +109,17 @@ export function updateOutcome(id: string, data: any): { success: boolean; notFou
 export function deleteOutcome(id: string): { success: boolean; notFound?: boolean } {
   const sanitizedId = sanitizeString(id);
   const result = repository.deleteOutcome(sanitizedId);
+  
+  if (result.changes === 0) {
+    return { success: false, notFound: true };
+  }
+  
+  return { success: true };
+}
+
+export function deleteOutcomeBySchool(id: string, schoolId: string): { success: boolean; notFound?: boolean } {
+  const sanitizedId = sanitizeString(id);
+  const result = repository.deleteOutcome(sanitizedId, schoolId);
   
   if (result.changes === 0) {
     return { success: false, notFound: true };

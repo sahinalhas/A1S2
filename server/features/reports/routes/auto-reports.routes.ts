@@ -1,11 +1,11 @@
-import { validateSchoolAccess } from '../../../middleware/school-access.middleware.js';
 /**
  * Auto Reports Routes
  */
 
 import { Router } from 'express';
 import { AutoReportGeneratorService } from '../services/auto-report-generator.service.js';
-import { validateSchoolAccess } from '../../../middleware/school-access.middleware.js';
+import { validateSchoolAccess, SchoolScopedRequest } from '../../../middleware/school-access.middleware.js';
+import * as studentsRepository from '../../students/repository/students.repository.js';
 
 const router = Router();
 router.use(validateSchoolAccess);
@@ -17,8 +17,19 @@ const reportService = new AutoReportGeneratorService();
  */
 router.post('/progress/:studentId', async (req, res) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId } = req.params;
     const { reportType, reportPeriod } = req.body;
+
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          error: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
+    }
 
     const report = await reportService.generateProgressReport(
       studentId,
@@ -45,8 +56,19 @@ router.post('/progress/:studentId', async (req, res) => {
  */
 router.post('/ram/:studentId', async (req, res) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId } = req.params;
     const { referralReason } = req.body;
+
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          error: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
+    }
 
     if (!referralReason) {
       return res.status(400).json({
@@ -76,8 +98,19 @@ router.post('/ram/:studentId', async (req, res) => {
  */
 router.post('/bep/:studentId', async (req, res) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId } = req.params;
     const { diagnosis } = req.body;
+
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          error: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
+    }
 
     const report = await reportService.generateBEPReport(studentId, diagnosis);
 
@@ -100,6 +133,7 @@ router.post('/bep/:studentId', async (req, res) => {
  */
 router.post('/bulk', async (req, res) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentIds, reportType } = req.body;
 
     if (!studentIds || !Array.isArray(studentIds)) {
@@ -107,6 +141,18 @@ router.post('/bulk', async (req, res) => {
         success: false,
         error: 'Öğrenci ID listesi gerekli'
       });
+    }
+
+    if (schoolId) {
+      for (const studentId of studentIds) {
+        const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+        if (!student) {
+          return res.status(403).json({
+            success: false,
+            error: `Öğrenci ${studentId} bu okula ait değil veya bulunamadı`
+          });
+        }
+      }
     }
 
     const reports = await reportService.generateBulkReports(

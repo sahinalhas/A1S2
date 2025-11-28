@@ -2,6 +2,8 @@ import { RequestHandler } from 'express';
 import { AIProviderService } from '../../../services/ai-provider.service.js';
 import { StudentContextService } from '../../../services/student-context.service.js';
 import AIPromptBuilder from '../../../services/ai-prompt-builder.service.js';
+import type { SchoolScopedRequest } from '../../../middleware/school-access.middleware.js';
+import * as studentsRepository from '../../students/repository/students.repository.js';
 
 const aiProvider = AIProviderService.getInstance();
 const contextService = new StudentContextService();
@@ -12,6 +14,7 @@ const contextService = new StudentContextService();
  */
 export const generateParentMeetingPrep: RequestHandler = async (req, res) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId } = req.body;
     
     if (!studentId) {
@@ -19,6 +22,16 @@ export const generateParentMeetingPrep: RequestHandler = async (req, res) => {
         success: false,
         error: 'Öğrenci ID gerekli'
       });
+    }
+    
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          error: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
     }
     
     const context = await contextService.getStudentContext(studentId);
@@ -56,6 +69,7 @@ export const generateParentMeetingPrep: RequestHandler = async (req, res) => {
  */
 export const generateInterventionPlan: RequestHandler = async (req, res) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId, focusArea } = req.body;
     
     if (!studentId || !focusArea) {
@@ -63,6 +77,16 @@ export const generateInterventionPlan: RequestHandler = async (req, res) => {
         success: false,
         error: 'Öğrenci ID ve odak alan gerekli'
       });
+    }
+    
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          error: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
     }
     
     const context = await contextService.getStudentContext(studentId);
@@ -100,6 +124,7 @@ export const generateInterventionPlan: RequestHandler = async (req, res) => {
  */
 export const generateTeacherMeetingPrep: RequestHandler = async (req, res) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId, meetingPurpose } = req.body;
     
     if (!studentId) {
@@ -107,6 +132,16 @@ export const generateTeacherMeetingPrep: RequestHandler = async (req, res) => {
         success: false,
         error: 'Öğrenci ID gerekli'
       });
+    }
+    
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          error: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
     }
     
     const context = await contextService.getStudentContext(studentId);

@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import * as service from '../services/outcomes.service.js';
+import type { SchoolScopedRequest } from '../../../middleware/school-access.middleware.js';
 
 export function getAllOutcomes(req: Request, res: Response) {
   try {
-    const outcomes = service.getAllOutcomes();
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
+    const outcomes = service.getAllOutcomesBySchool(schoolId);
     res.json(outcomes);
   } catch (error) {
     console.error('Error fetching outcomes:', error);
@@ -13,7 +15,8 @@ export function getAllOutcomes(req: Request, res: Response) {
 
 export function getOutcomesRequiringFollowUp(req: Request, res: Response) {
   try {
-    const outcomes = service.getOutcomesRequiringFollowUp();
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
+    const outcomes = service.getOutcomesRequiringFollowUpBySchool(schoolId);
     res.json(outcomes);
   } catch (error) {
     console.error('Error fetching outcomes requiring follow-up:', error);
@@ -23,11 +26,12 @@ export function getOutcomesRequiringFollowUp(req: Request, res: Response) {
 
 export function getOutcomeById(req: Request, res: Response) {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
     const { id } = req.params;
-    const outcome = service.getOutcomeById(id);
+    const outcome = service.getOutcomeByIdAndSchool(id, schoolId);
     
     if (!outcome) {
-      return res.status(404).json({ error: 'Sonuç bulunamadı' });
+      return res.status(404).json({ error: 'Sonuç bulunamadı veya bu okula ait değil' });
     }
     
     res.json(outcome);
@@ -39,11 +43,12 @@ export function getOutcomeById(req: Request, res: Response) {
 
 export function getOutcomeBySessionId(req: Request, res: Response) {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
     const { sessionId } = req.params;
-    const outcome = service.getOutcomeBySessionId(sessionId);
+    const outcome = service.getOutcomeBySessionIdAndSchool(sessionId, schoolId);
     
     if (!outcome) {
-      return res.status(404).json({ error: 'Bu görüşme için sonuç bulunamadı' });
+      return res.status(404).json({ error: 'Bu görüşme için sonuç bulunamadı veya bu okula ait değil' });
     }
     
     res.json(outcome);
@@ -74,7 +79,14 @@ export function createOutcome(req: Request, res: Response) {
 
 export function updateOutcome(req: Request, res: Response) {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
     const { id } = req.params;
+    
+    const existing = service.getOutcomeByIdAndSchool(id, schoolId);
+    if (!existing) {
+      return res.status(404).json({ error: 'Sonuç bulunamadı veya bu okula ait değil' });
+    }
+    
     const result = service.updateOutcome(id, req.body);
     
     if (result.notFound) {
@@ -93,11 +105,13 @@ export function updateOutcome(req: Request, res: Response) {
 
 export function deleteOutcome(req: Request, res: Response) {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
     const { id } = req.params;
-    const result = service.deleteOutcome(id);
+    
+    const result = service.deleteOutcomeBySchool(id, schoolId);
     
     if (result.notFound) {
-      return res.status(404).json({ error: 'Sonuç bulunamadı' });
+      return res.status(404).json({ error: 'Sonuç bulunamadı veya bu okula ait değil' });
     }
     
     res.json({ success: true });

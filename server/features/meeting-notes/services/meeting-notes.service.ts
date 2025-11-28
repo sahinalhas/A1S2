@@ -78,3 +78,11 @@ export function removeMeetingNote(id: string): void {
   
   repository.deleteMeetingNote(id);
 }
+
+export function getMeetingNoteById(id: string): MeetingNote | null {
+  if (!id || typeof id !== 'string' || id.length > 50) {
+    throw new Error("Geçersiz not ID");
+  }
+  
+  return repository.getMeetingNoteById(id);
+}

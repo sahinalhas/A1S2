@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import * as service from '../services/reminders.service.js';
+import type { SchoolScopedRequest } from '../../../middleware/school-access.middleware.js';
 
 export function getAllReminders(req: Request, res: Response) {
   try {
-    const reminders = service.getAllReminders();
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
+    const reminders = service.getAllRemindersBySchool(schoolId);
     res.json(reminders);
   } catch (error) {
     console.error('Error fetching reminders:', error);
@@ -13,11 +15,12 @@ export function getAllReminders(req: Request, res: Response) {
 
 export function getReminderById(req: Request, res: Response) {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
     const { id } = req.params;
-    const reminder = service.getReminderById(id);
+    const reminder = service.getReminderByIdAndSchool(id, schoolId);
     
     if (!reminder) {
-      return res.status(404).json({ error: 'Hatırlatıcı bulunamadı' });
+      return res.status(404).json({ error: 'Hatırlatıcı bulunamadı veya bu okula ait değil' });
     }
     
     res.json(reminder);
@@ -29,13 +32,14 @@ export function getReminderById(req: Request, res: Response) {
 
 export function getRemindersBySessionId(req: Request, res: Response) {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
     const { sessionId } = req.query;
     
     if (!sessionId || typeof sessionId !== 'string') {
       return res.status(400).json({ error: 'Session ID gereklidir' });
     }
     
-    const reminders = service.getRemindersBySessionId(sessionId);
+    const reminders = service.getRemindersBySessionIdAndSchool(sessionId, schoolId);
     res.json(reminders);
   } catch (error) {
     console.error('Error fetching reminders by session:', error);
@@ -45,13 +49,14 @@ export function getRemindersBySessionId(req: Request, res: Response) {
 
 export function getRemindersByStatus(req: Request, res: Response) {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
     const { status } = req.query;
     
     if (!status || typeof status !== 'string') {
       return res.status(400).json({ error: 'Status gereklidir' });
     }
     
-    const reminders = service.getRemindersByStatus(status);
+    const reminders = service.getRemindersByStatusAndSchool(status, schoolId);
     res.json(reminders);
   } catch (error) {
     console.error('Error fetching reminders by status:', error);
@@ -61,7 +66,8 @@ export function getRemindersByStatus(req: Request, res: Response) {
 
 export function getPendingReminders(req: Request, res: Response) {
   try {
-    const reminders = service.getPendingReminders();
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
+    const reminders = service.getPendingRemindersBySchool(schoolId);
     res.json(reminders);
   } catch (error) {
     console.error('Error fetching pending reminders:', error);
@@ -87,7 +93,13 @@ export function createReminder(req: Request, res: Response) {
 
 export function updateReminder(req: Request, res: Response) {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
     const { id } = req.params;
+    
+    const existing = service.getReminderByIdAndSchool(id, schoolId);
+    if (!existing) {
+      return res.status(404).json({ error: 'Hatırlatıcı bulunamadı veya bu okula ait değil' });
+    }
     
     const result = service.updateReminder(id, req.body);
     
@@ -104,6 +116,7 @@ export function updateReminder(req: Request, res: Response) {
 
 export function updateReminderStatus(req: Request, res: Response) {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
     const { id } = req.params;
     const { status } = req.body;
     
@@ -111,7 +124,12 @@ export function updateReminderStatus(req: Request, res: Response) {
       return res.status(400).json({ error: 'Status gereklidir' });
     }
     
-    const result = service.updateReminderStatus(id, status);
+    const existing = service.getReminderByIdAndSchool(id, schoolId);
+    if (!existing) {
+      return res.status(404).json({ error: 'Hatırlatıcı bulunamadı veya bu okula ait değil' });
+    }
+    
+    const result = service.updateReminderStatusBySchool(id, status, schoolId);
     
     if (result.notFound) {
       return res.status(404).json({ error: 'Hatırlatıcı bulunamadı' });
@@ -126,11 +144,13 @@ export function updateReminderStatus(req: Request, res: Response) {
 
 export function deleteReminder(req: Request, res: Response) {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId!;
     const { id } = req.params;
-    const result = service.deleteReminder(id);
+    
+    const result = service.deleteReminderBySchool(id, schoolId);
     
     if (result.notFound) {
-      return res.status(404).json({ error: 'Hatırlatıcı bulunamadı' });
+      return res.status(404).json({ error: 'Hatırlatıcı bulunamadı veya bu okula ait değil' });
     }
     
     res.json({ success: true });

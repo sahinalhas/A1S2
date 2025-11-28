@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { AdvancedAnalyticsDashboardService } from '../../../services/advanced-analytics-dashboard.service';
-import { validateSchoolAccess } from '../../../middleware/school-access.middleware.js';
+import { validateSchoolAccess, SchoolScopedRequest } from '../../../middleware/school-access.middleware.js';
+import * as studentsRepository from '../../students/repository/students.repository.js';
 
 const router = Router();
 router.use(validateSchoolAccess);
@@ -8,7 +9,19 @@ const dashboardService = new AdvancedAnalyticsDashboardService();
 
 router.get('/dashboard/:studentId', async (req, res) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId } = req.params;
+    
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          error: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
+    }
+    
     const overview = await dashboardService.generateDashboardOverview(studentId);
     
     res.json({
@@ -26,6 +39,7 @@ router.get('/dashboard/:studentId', async (req, res) => {
 
 router.post('/generate-report', async (req, res) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId, reportType } = req.body;
     
     if (!studentId || !reportType) {
@@ -33,6 +47,16 @@ router.post('/generate-report', async (req, res) => {
         success: false,
         error: 'studentId ve reportType gereklidir'
       });
+    }
+
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          error: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
     }
 
     const report = await dashboardService.generateAIReport(studentId, reportType);

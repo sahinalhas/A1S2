@@ -6,13 +6,13 @@
 import { getDatabase } from '../../../lib/database/connection.js';
 import type { ClassComparison, StudentBrief } from '../types/advanced-reports.types.js';
 
-export function getClassComparisons(classNames?: string[]): ClassComparison[] {
+export function getClassComparisons(schoolId: string, classNames?: string[]): ClassComparison[] {
   const db = getDatabase();
   
-  let classFilter = '';
+  let classFilter = 'WHERE s.school_id = ?';
   if (classNames && classNames.length > 0) {
     const placeholders = classNames.map(() => '?').join(',');
-    classFilter = `WHERE s.class IN (${placeholders})`;
+    classFilter += ` AND s.class IN (${placeholders})`;
   }
   
   const query = `
@@ -38,7 +38,7 @@ export function getClassComparisons(classNames?: string[]): ClassComparison[] {
     SELECT * FROM class_stats ORDER BY class
   `;
   
-  const params = classNames && classNames.length > 0 ? classNames : [];
+  const params = classNames && classNames.length > 0 ? [schoolId, ...classNames] : [schoolId];
   const classStats = db.prepare(query).all(...params) as any[];
   
   return classStats.map(stat => {
@@ -153,12 +153,12 @@ function analyzeClassPerformance(stat: any): { strengths: string[]; challenges: 
   return { strengths, challenges };
 }
 
-export function compareClasses(className1: string, className2: string): {
+export function compareClasses(schoolId: string, className1: string, className2: string): {
   class1: ClassComparison;
   class2: ClassComparison;
   insights: string[];
 } {
-  const comparisons = getClassComparisons([className1, className2]);
+  const comparisons = getClassComparisons(schoolId, [className1, className2]);
   
   if (comparisons.length < 2) {
     throw new Error('İki sınıf da bulunamadı');

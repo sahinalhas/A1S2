@@ -7,6 +7,7 @@ import { getDatabase } from '../../../lib/database/connection.js';
 import type { TrendData, TimeSeriesAnalysis } from '../types/advanced-reports.types.js';
 
 export function getTrendData(
+  schoolId: string,
   period: 'daily' | 'weekly' | 'monthly',
   startDate?: string,
   endDate?: string
@@ -38,12 +39,13 @@ export function getTrendData(
     WITH period_data AS (
       SELECT 
         ${dateFormat} as period,
-        AVG(avg_exam_score) as academicAverage,
-        AVG(attendance_rate) as attendanceRate,
-        COUNT(DISTINCT student_id) as totalStudents,
-        SUM(CASE WHEN risk_level IN ('Yüksek', 'Kritik') THEN 1 ELSE 0 END) as riskStudents
-      FROM student_analytics_snapshot
-      WHERE DATE(last_updated) BETWEEN ? AND ?
+        AVG(sas.avg_exam_score) as academicAverage,
+        AVG(sas.attendance_rate) as attendanceRate,
+        COUNT(DISTINCT sas.student_id) as totalStudents,
+        SUM(CASE WHEN sas.risk_level IN ('Yüksek', 'Kritik') THEN 1 ELSE 0 END) as riskStudents
+      FROM student_analytics_snapshot sas
+      INNER JOIN students s ON sas.student_id = s.id
+      WHERE DATE(sas.last_updated) BETWEEN ? AND ? AND s.school_id = ?
       GROUP BY ${groupBy}
     ),
     session_data AS (
@@ -51,15 +53,16 @@ export function getTrendData(
         ${dateFormat.replace('created_at', 'sessionDate')} as period,
         COUNT(*) as sessionCount
       FROM counseling_sessions
-      WHERE DATE(sessionDate) BETWEEN ? AND ?
+      WHERE DATE(sessionDate) BETWEEN ? AND ? AND schoolId = ?
       GROUP BY ${groupBy.replace('created_at', 'sessionDate')}
     ),
     behavior_data AS (
       SELECT 
         ${dateFormat.replace('created_at', 'incidentDate')} as period,
         COUNT(*) as behaviorIncidents
-      FROM behavior_incidents
-      WHERE DATE(incidentDate) BETWEEN ? AND ?
+      FROM behavior_incidents bi
+      INNER JOIN students s ON bi.studentId = s.id
+      WHERE DATE(bi.incidentDate) BETWEEN ? AND ? AND s.school_id = ?
       GROUP BY ${groupBy.replace('created_at', 'incidentDate')}
     )
     SELECT 
@@ -76,15 +79,16 @@ export function getTrendData(
     ORDER BY pd.period
   `;
   
-  return db.prepare(query).all(start, end, start, end, start, end) as TrendData[];
+  return db.prepare(query).all(start, end, schoolId, start, end, schoolId, start, end, schoolId) as TrendData[];
 }
 
 export function analyzeTimeSeries(
+  schoolId: string,
   period: 'daily' | 'weekly' | 'monthly',
   startDate?: string,
   endDate?: string
 ): TimeSeriesAnalysis {
-  const trends = getTrendData(period, startDate, endDate);
+  const trends = getTrendData(schoolId, period, startDate, endDate);
   
   if (trends.length === 0) {
     return createEmptyAnalysis(period, startDate, endDate);

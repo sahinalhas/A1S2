@@ -7,9 +7,8 @@ import { Router, Request, Response } from 'express';
 import { advancedReportsService } from '../services/advanced-reports.service.js';
 import { exportService } from '../services/export.service.js';
 import { simpleRateLimit } from '../../../middleware/validation.js';
-import { validateSchoolAccess } from '../../../middleware/school-access.middleware.js';
+import { validateSchoolAccess, SchoolScopedRequest } from '../../../middleware/school-access.middleware.js';
 import { exportRateLimiter } from '../../../middleware/rate-limit.middleware.js';
-import { validateSchoolAccess } from '../../../middleware/school-access.middleware.js';
 
 const router = Router();
 router.use(validateSchoolAccess);
@@ -20,7 +19,11 @@ router.use(validateSchoolAccess);
  */
 router.get('/school-stats', simpleRateLimit(100, 60 * 1000), async (req: Request, res: Response) => {
   try {
-    const stats = await advancedReportsService.getSchoolStatistics(req.schoolId || '');
+    const schoolId = (req as SchoolScopedRequest).schoolId;
+    if (!schoolId) {
+      return res.status(400).json({ error: 'School ID gerekli' });
+    }
+    const stats = await advancedReportsService.getSchoolStatistics(schoolId);
     res.json(stats);
   } catch (error) {
     console.error('Error fetching school statistics:', error);
@@ -34,10 +37,14 @@ router.get('/school-stats', simpleRateLimit(100, 60 * 1000), async (req: Request
  */
 router.get('/class-comparisons', simpleRateLimit(100, 60 * 1000), async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
+    if (!schoolId) {
+      return res.status(400).json({ error: 'School ID gerekli' });
+    }
     const { classes } = req.query;
     const classNames = classes ? (classes as string).split(',') : undefined;
     
-    const comparisons = await advancedReportsService.getClassComparisons(classNames);
+    const comparisons = await advancedReportsService.getClassComparisons(schoolId, classNames);
     res.json(comparisons);
   } catch (error) {
     console.error('Error fetching class comparisons:', error);
@@ -51,8 +58,13 @@ router.get('/class-comparisons', simpleRateLimit(100, 60 * 1000), async (req: Re
  */
 router.get('/compare/:class1/:class2', simpleRateLimit(100, 60 * 1000), async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
+    if (!schoolId) {
+      return res.status(400).json({ error: 'School ID gerekli' });
+    }
     const { class1, class2 } = req.params;
     const comparison = await advancedReportsService.compareClasses(
+      schoolId,
       decodeURIComponent(class1),
       decodeURIComponent(class2)
     );
@@ -69,6 +81,10 @@ router.get('/compare/:class1/:class2', simpleRateLimit(100, 60 * 1000), async (r
  */
 router.get('/trends', simpleRateLimit(100, 60 * 1000), async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
+    if (!schoolId) {
+      return res.status(400).json({ error: 'School ID gerekli' });
+    }
     const { period, startDate, endDate } = req.query;
     
     const validPeriods = ['daily', 'weekly', 'monthly'];
@@ -77,6 +93,7 @@ router.get('/trends', simpleRateLimit(100, 60 * 1000), async (req: Request, res:
       : 'monthly';
     
     const analysis = await advancedReportsService.getTrendAnalysis(
+      schoolId,
       selectedPeriod,
       startDate as string,
       endDate as string
@@ -95,13 +112,17 @@ router.get('/trends', simpleRateLimit(100, 60 * 1000), async (req: Request, res:
  */
 router.post('/comprehensive', simpleRateLimit(20, 60 * 1000), async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
+    if (!schoolId) {
+      return res.status(400).json({ error: 'School ID gerekli' });
+    }
     const { generatedBy, includeAIAnalysis, classNames, period, startDate, endDate } = req.body;
     
     if (!generatedBy) {
       return res.status(400).json({ error: 'generatedBy alanı gereklidir' });
     }
     
-    const report = await advancedReportsService.generateComprehensiveReport(generatedBy, {
+    const report = await advancedReportsService.generateComprehensiveReport(schoolId, generatedBy, {
       includeAIAnalysis,
       classNames,
       period,
@@ -122,7 +143,11 @@ router.post('/comprehensive', simpleRateLimit(20, 60 * 1000), async (req: Reques
  */
 router.get('/available-classes', simpleRateLimit(100, 60 * 1000), async (req: Request, res: Response) => {
   try {
-    const classes = advancedReportsService.getAvailableClasses();
+    const schoolId = (req as SchoolScopedRequest).schoolId;
+    if (!schoolId) {
+      return res.status(400).json({ error: 'School ID gerekli' });
+    }
+    const classes = advancedReportsService.getAvailableClasses(schoolId);
     res.json(classes);
   } catch (error) {
     console.error('Error fetching available classes:', error);
@@ -136,13 +161,17 @@ router.get('/available-classes', simpleRateLimit(100, 60 * 1000), async (req: Re
  */
 router.post('/export/excel', exportRateLimiter, async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
+    if (!schoolId) {
+      return res.status(400).json({ error: 'School ID gerekli' });
+    }
     const { generatedBy, includeAIAnalysis, classNames, period, startDate, endDate, anonymize } = req.body;
     
     if (!generatedBy) {
       return res.status(400).json({ error: 'generatedBy alanı gereklidir' });
     }
     
-    const report = await advancedReportsService.generateComprehensiveReport(generatedBy, {
+    const report = await advancedReportsService.generateComprehensiveReport(schoolId, generatedBy, {
       includeAIAnalysis,
       classNames,
       period,

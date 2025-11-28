@@ -36,6 +36,16 @@ export function getMeetingNotesByStudent(studentId: string): MeetingNote[] {
   }
 }
 
+export function getMeetingNoteById(id: string): MeetingNote | null {
+  try {
+    ensureInitialized();
+    return statements.getMeetingNote.get(id) as MeetingNote | null;
+  } catch (error) {
+    console.error('Database error in getMeetingNoteById:', error);
+    return null;
+  }
+}
+
 export function saveMeetingNote(note: MeetingNote): void {
   try {
     ensureInitialized();

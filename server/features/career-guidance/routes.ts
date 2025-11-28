@@ -8,8 +8,11 @@ import type { Request, Response } from 'express';
 import getDatabase from '../../lib/database';
 import { CareerGuidanceService } from './services/career-guidance.service';
 import type { CareerCategory } from '../../../shared/types/career-guidance.types';
+import { validateSchoolAccess, SchoolScopedRequest } from '../../middleware/school-access.middleware.js';
+import * as studentsRepository from '../students/repository/students.repository.js';
 
 const router = express.Router();
+router.use(validateSchoolAccess);
 
 /**
  * GET /api/career-guidance/careers
@@ -86,6 +89,7 @@ router.get('/careers/:id', async (req: Request, res: Response) => {
  */
 router.post('/analyze', async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId, careerId } = req.body;
 
     if (!studentId) {
@@ -93,6 +97,16 @@ router.post('/analyze', async (req: Request, res: Response) => {
         success: false,
         message: 'Öğrenci ID gereklidir'
       });
+    }
+
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
     }
 
     const db = getDatabase();
@@ -120,6 +134,7 @@ router.post('/analyze', async (req: Request, res: Response) => {
  */
 router.post('/roadmap', async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId, careerId, customGoals } = req.body;
 
     if (!studentId || !careerId) {
@@ -127,6 +142,16 @@ router.post('/roadmap', async (req: Request, res: Response) => {
         success: false,
         message: 'Öğrenci ID ve Kariyer ID gereklidir'
       });
+    }
+
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
     }
 
     const db = getDatabase();
@@ -154,7 +179,18 @@ router.post('/roadmap', async (req: Request, res: Response) => {
  */
 router.get('/students/:studentId/roadmap', async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId } = req.params;
+
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
+    }
 
     const db = getDatabase();
     const service = new CareerGuidanceService(db);
@@ -188,7 +224,18 @@ router.get('/students/:studentId/roadmap', async (req: Request, res: Response) =
  */
 router.get('/students/:studentId/roadmaps', async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId } = req.params;
+
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
+    }
 
     const db = getDatabase();
     const service = new CareerGuidanceService(db);
@@ -216,11 +263,25 @@ router.get('/students/:studentId/roadmaps', async (req: Request, res: Response) 
  */
 router.put('/roadmap/:roadmapId', async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { roadmapId } = req.params;
     const updates = req.body;
 
     const db = getDatabase();
     const service = new CareerGuidanceService(db);
+
+    if (schoolId) {
+      const roadmap = service.getRoadmapById(roadmapId);
+      if (roadmap && roadmap.studentId) {
+        const student = studentsRepository.getStudentByIdAndSchool(roadmap.studentId, schoolId);
+        if (!student) {
+          return res.status(403).json({
+            success: false,
+            message: 'Bu yol haritasına erişim izniniz yok'
+          });
+        }
+      }
+    }
 
     service.updateRoadmapProgress(roadmapId, updates);
 
@@ -244,7 +305,18 @@ router.put('/roadmap/:roadmapId', async (req: Request, res: Response) => {
  */
 router.get('/students/:studentId/competencies', async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId } = req.params;
+
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
+    }
 
     const db = getDatabase();
     const service = new CareerGuidanceService(db);
@@ -272,7 +344,18 @@ router.get('/students/:studentId/competencies', async (req: Request, res: Respon
  */
 router.post('/students/:studentId/competencies/refresh', async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId } = req.params;
+
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
+    }
 
     const db = getDatabase();
     const service = new CareerGuidanceService(db);
@@ -301,7 +384,18 @@ router.post('/students/:studentId/competencies/refresh', async (req: Request, re
  */
 router.get('/students/:studentId/competencies/stats', async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId } = req.params;
+
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
+    }
 
     const db = getDatabase();
     const service = new CareerGuidanceService(db);
@@ -328,8 +422,19 @@ router.get('/students/:studentId/competencies/stats', async (req: Request, res: 
  */
 router.get('/students/:studentId/analysis-history', async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId } = req.params;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
+    }
 
     const db = getDatabase();
     const service = new CareerGuidanceService(db);
@@ -357,6 +462,7 @@ router.get('/students/:studentId/analysis-history', async (req: Request, res: Re
  */
 router.post('/compare', async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { studentId, careerIds } = req.body;
 
     if (!studentId || !careerIds || !Array.isArray(careerIds)) {
@@ -364,6 +470,16 @@ router.post('/compare', async (req: Request, res: Response) => {
         success: false,
         message: 'Öğrenci ID ve kariyer ID listesi gereklidir'
       });
+    }
+
+    if (schoolId) {
+      const student = studentsRepository.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({
+          success: false,
+          message: 'Bu öğrenciye erişim izniniz yok veya öğrenci bulunamadı'
+        });
+      }
     }
 
     const db = getDatabase();
@@ -391,12 +507,32 @@ router.post('/compare', async (req: Request, res: Response) => {
  */
 router.delete('/roadmap/:roadmapId', async (req: Request, res: Response) => {
   try {
+    const schoolId = (req as SchoolScopedRequest).schoolId;
     const { roadmapId } = req.params;
 
     const db = getDatabase();
     const service = new CareerGuidanceService(db);
 
-    service.deleteRoadmap(roadmapId, req.schoolId);
+    if (schoolId) {
+      const roadmap = service.getRoadmapById(roadmapId);
+      if (!roadmap) {
+        return res.status(404).json({
+          success: false,
+          message: 'Yol haritası bulunamadı'
+        });
+      }
+      if (roadmap.studentId) {
+        const student = studentsRepository.getStudentByIdAndSchool(roadmap.studentId, schoolId);
+        if (!student) {
+          return res.status(403).json({
+            success: false,
+            message: 'Bu yol haritasını silme izniniz yok'
+          });
+        }
+      }
+    }
+
+    service.deleteRoadmap(roadmapId, schoolId);
 
     res.json({
       success: true,
