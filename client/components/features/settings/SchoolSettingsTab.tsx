@@ -160,6 +160,7 @@ export default function SchoolSettingsTab() {
       const result = await response.json();
       if (result.success) {
         toast.success("Varsayılan okul değiştirildi");
+        setSchools(result.schools);
         await loadUserSchools();
       } else {
         toast.error(result.message || "Başarısız");
