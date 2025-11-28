@@ -48,7 +48,7 @@ export async function generateDeepAnalysis(studentId: string, schoolId?: string)
     analyzeStudentTrajectory(studentId),
     generateInterventionPlan(studentId),
     analyzeSuccessFactors(studentId),
-    generateComparativeAnalysis(studentId)
+    generateComparativeAnalysis(studentId, schoolId)
   ]);
   
   // AI ile executive summary oluştur
@@ -282,11 +282,19 @@ async function analyzeSuccessFactors(studentId: string): Promise<SuccessFactorAn
 
 /**
  * Karşılaştırmalı analiz
+ * @param studentId - Öğrenci ID
+ * @param schoolId - Okul ID (güvenlik kontrolü için)
  */
-async function generateComparativeAnalysis(studentId: string): Promise<ComparativeAnalysis> {
-  const students = studentsRepo.loadStudents();
-  const student = students.find(s => s.id === studentId);
-  if (!student) throw new Error('Öğrenci bulunamadı');
+async function generateComparativeAnalysis(studentId: string, schoolId?: string): Promise<ComparativeAnalysis> {
+  let student;
+  
+  if (schoolId) {
+    student = studentsRepo.getStudentByIdAndSchool(studentId, schoolId);
+    if (!student) throw new Error('Öğrenci bulunamadı veya bu okula ait değil');
+  } else {
+    student = studentsRepo.getStudentById(studentId);
+    if (!student) throw new Error('Öğrenci bulunamadı');
+  }
   
   // Sınıf ortalamaları
   const classStats = db.prepare(`

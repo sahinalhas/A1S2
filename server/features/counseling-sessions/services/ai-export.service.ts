@@ -75,15 +75,24 @@ export function convertSessionToAIFormat(session: CounselingSession): AIReadySes
   };
 }
 
-export function exportSessionsForAI(sessionIds?: string[]): AIReadySessionData[] {
+/**
+ * Oturumları AI formatına dönüştürür.
+ * @param schoolId - Okul ID'si (zorunlu - güvenlik için)
+ * @param sessionIds - Belirli oturum ID'leri (opsiyonel)
+ */
+export function exportSessionsForAI(schoolId: string, sessionIds?: string[]): AIReadySessionData[] {
+  if (!schoolId) {
+    throw new Error('schoolId is required for exportSessionsForAI');
+  }
+  
   let sessions: CounselingSession[];
   
   if (sessionIds && sessionIds.length > 0) {
     sessions = sessionIds
-      .map(id => repository.getSessionById(id))
+      .map(id => repository.getSessionByIdAndSchool(id, schoolId))
       .filter((s): s is CounselingSession => s !== null);
   } else {
-    sessions = repository.getAllSessions();
+    sessions = repository.getSessionsBySchool(schoolId);
   }
 
   return sessions
@@ -143,7 +152,12 @@ function calculateDuration(entryTime: string, exitTime: string): number {
   return exitMinutes - entryMinutes;
 }
 
-export function aggregateSessionDataForStudent(studentId: string): {
+/**
+ * Öğrenci için oturum verilerini toplar.
+ * @param studentId - Öğrenci ID'si
+ * @param schoolId - Okul ID'si (zorunlu - güvenlik için)
+ */
+export function aggregateSessionDataForStudent(studentId: string, schoolId: string): {
   totalSessions: number;
   averageCooperation: number;
   commonEmotionalStates: string[];
@@ -151,7 +165,11 @@ export function aggregateSessionDataForStudent(studentId: string): {
   riskIndicators: string[];
   progressTrend: 'improving' | 'stable' | 'declining' | 'unknown';
 } {
-  const sessions = repository.getAllSessions()
+  if (!schoolId) {
+    throw new Error('schoolId is required for aggregateSessionDataForStudent');
+  }
+  
+  const sessions = repository.getSessionsBySchool(schoolId)
     .filter(s => s.completed === 1)
     .map(convertSessionToAIFormat);
 
