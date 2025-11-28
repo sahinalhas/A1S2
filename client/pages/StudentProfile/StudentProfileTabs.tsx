@@ -6,6 +6,7 @@
  * Tarih: 21 Kasım 2025
  */
 
+import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/organisms/Tabs";
 import { STUDENT_PROFILE_MAIN_TABS } from "@/config/tabs";
 import { StudentData } from "@/hooks/features/student-profile";
@@ -35,10 +36,13 @@ export function StudentProfileTabs({
   scoresData,
   loadingScores,
 }: StudentProfileTabsProps) {
+  const [searchParams] = useSearchParams();
   const studentName = `${student.name} ${student.surname}`;
+  const tabFromUrl = searchParams.get("tab");
+  const defaultTab = (tabFromUrl || "overview") as string;
 
   return (
-    <Tabs defaultValue="overview" className="space-y-4">
+    <Tabs defaultValue={defaultTab} className="space-y-4">
       <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
         {STUDENT_PROFILE_MAIN_TABS.map((tabConfig) => {
           const Icon = tabConfig.icon;

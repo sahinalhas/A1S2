@@ -16,7 +16,7 @@ import {
  DropdownMenuItem,
  DropdownMenuTrigger,
 } from '@/components/organisms/DropdownMenu';
-import { Eye, Pencil, Trash2, ArrowUpDown, ArrowUp, ArrowDown, MoreVertical } from 'lucide-react';
+import { Eye, Pencil, Trash2, ArrowUpDown, ArrowUp, ArrowDown, MoreVertical, GraduationCap, Heart, Target, BookOpen } from 'lucide-react';
 import type { Student } from '@/lib/storage';
 import { Link } from 'react-router-dom';
 import type { ColumnVisibility } from './TableControls';
@@ -110,16 +110,65 @@ const StudentRow = memo(
  </TableCell>
  )}
  {columnVisibility.actions && (
- <TableCell className="py-2.5 w-24">
- <div className="flex items-center gap-1">
+ <TableCell className="py-2.5">
+ <div className="flex items-center gap-0.5">
  <Button 
  asChild 
  size="sm" 
  variant="ghost" 
- className="h-8 w-8 p-0 text-blue-600"
+ className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700"
+ title="Profili Görüntüle"
  >
  <Link to={`/ogrenci/${student.id}`}>
  <Eye className="h-4 w-4" />
+ </Link>
+ </Button>
+ 
+ <Button 
+ asChild 
+ size="sm" 
+ variant="ghost" 
+ className="h-8 w-8 p-0 text-purple-600 hover:text-purple-700"
+ title="Akademik Durum"
+ >
+ <Link to={`/ogrenci/${student.id}?tab=academic`}>
+ <GraduationCap className="h-4 w-4" />
+ </Link>
+ </Button>
+
+ <Button 
+ asChild 
+ size="sm" 
+ variant="ghost" 
+ className="h-8 w-8 p-0 text-pink-600 hover:text-pink-700"
+ title="Psikososyal Durum"
+ >
+ <Link to={`/ogrenci/${student.id}?tab=psychosocial`}>
+ <Heart className="h-4 w-4" />
+ </Link>
+ </Button>
+
+ <Button 
+ asChild 
+ size="sm" 
+ variant="ghost" 
+ className="h-8 w-8 p-0 text-orange-600 hover:text-orange-700"
+ title="Kariyer Rehberliği"
+ >
+ <Link to={`/ogrenci/${student.id}?tab=career`}>
+ <Target className="h-4 w-4" />
+ </Link>
+ </Button>
+
+ <Button 
+ asChild 
+ size="sm" 
+ variant="ghost" 
+ className="h-8 w-8 p-0 text-green-600 hover:text-green-700"
+ title="Tanıtıcı Bilgiler"
+ >
+ <Link to={`/ogrenci/${student.id}?tab=demographics`}>
+ <BookOpen className="h-4 w-4" />
  </Link>
  </Button>
  
@@ -129,6 +178,7 @@ const StudentRow = memo(
  size="sm"
  variant="ghost"
  className="h-8 w-8 p-0"
+ title="Daha Fazla İşlem"
  >
  <MoreVertical className="h-4 w-4" />
  </Button>
@@ -267,7 +317,7 @@ export function EnhancedStudentTable({
  </TableHead>
  )}
  {columnVisibility.actions && (
- <TableHead className="py-2.5 w-24">İşlemler</TableHead>
+ <TableHead className="py-2.5">İşlemler</TableHead>
  )}
  </TableRow>
  </TableHeader>

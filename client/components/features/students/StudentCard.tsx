@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/organisms/Card';
 import { Badge } from '@/components/atoms/Badge';
 import { Button } from '@/components/atoms/Button';
 import { Checkbox } from '@/components/atoms/Checkbox';
-import { Eye, Pencil, Trash2, User, GraduationCap, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Eye, Pencil, Trash2, User, GraduationCap, AlertTriangle, ArrowRight, Heart, Target, BookOpen } from 'lucide-react';
 import type { Student } from '@/lib/storage';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -124,19 +124,56 @@ export function StudentCard({
  </Badge>
  </div>
 
- {/* Action Buttons */}
- <div className="flex gap-2 pt-3 border-t border-border/50">
+ {/* Action Buttons - Shortcuts */}
+ <div className="flex gap-1.5 pt-2 border-t border-border/50">
  <Button
  asChild
  size="sm"
- className="flex-1 text-xs h-10 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-md hover:shadow-lg transition-all"
+ className="flex-1 text-xs h-9 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
  onClick={(e) => e.stopPropagation()}
+ title="Profili Görüntüle"
  >
  <Link to={`/ogrenci/${student.id}`}>
- <Eye className="mr-2 h-4 w-4" />
- Profil
+ <Eye className="h-3.5 w-3.5" />
  </Link>
  </Button>
+
+ <Button
+ asChild
+ size="sm"
+ className="flex-1 text-xs h-9 bg-purple-600 hover:bg-purple-700 text-white shadow-sm"
+ onClick={(e) => e.stopPropagation()}
+ title="Akademik Durum"
+ >
+ <Link to={`/ogrenci/${student.id}?tab=academic`}>
+ <GraduationCap className="h-3.5 w-3.5" />
+ </Link>
+ </Button>
+
+ <Button
+ asChild
+ size="sm"
+ className="flex-1 text-xs h-9 bg-pink-600 hover:bg-pink-700 text-white shadow-sm"
+ onClick={(e) => e.stopPropagation()}
+ title="Psikososyal Durum"
+ >
+ <Link to={`/ogrenci/${student.id}?tab=psychosocial`}>
+ <Heart className="h-3.5 w-3.5" />
+ </Link>
+ </Button>
+
+ <Button
+ asChild
+ size="sm"
+ className="flex-1 text-xs h-9 bg-orange-600 hover:bg-orange-700 text-white shadow-sm"
+ onClick={(e) => e.stopPropagation()}
+ title="Kariyer Rehberliği"
+ >
+ <Link to={`/ogrenci/${student.id}?tab=career`}>
+ <Target className="h-3.5 w-3.5" />
+ </Link>
+ </Button>
+
  {onEdit && (
  <Button
  size="sm"
@@ -145,9 +182,10 @@ export function StudentCard({
  e.stopPropagation();
  onEdit(student);
  }}
- className="h-10 px-4 hover:bg-orange-500/10 hover:border-orange-500/50 hover:text-orange-600 transition-all"
+ className="h-9 px-2.5 hover:bg-orange-500/10 hover:border-orange-500/50 hover:text-orange-600 transition-all"
+ title="Düzenle"
  >
- <Pencil className="h-4 w-4" />
+ <Pencil className="h-3.5 w-3.5" />
  </Button>
  )}
  {onDelete && (
@@ -158,9 +196,10 @@ export function StudentCard({
  e.stopPropagation();
  onDelete(student);
  }}
- className="h-10 px-4 text-destructive hover:bg-destructive/10 hover:border-destructive/50 transition-all"
+ className="h-9 px-2.5 text-destructive hover:bg-destructive/10 hover:border-destructive/50 transition-all"
+ title="Sil"
  >
- <Trash2 className="h-4 w-4" />
+ <Trash2 className="h-3.5 w-3.5" />
  </Button>
  )}
  </div>
