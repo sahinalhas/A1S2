@@ -20,7 +20,7 @@ export async function analyzeStudentRisk(studentId: string): Promise<RiskAnalysi
   const riskData: RiskFactorData = {
     academicPerformance: {
       gpa: academicRecords.length > 0 ? academicRecords[0].gpa : undefined,
-      recentExamScores: examResults.slice(0, 3).map(e => e.totalScore).filter(s => s !== undefined) as number[],
+      recentExamScores: examResults.slice(0, 3).map((e: any) => e.totalScore).filter((s: any) => s !== undefined) as number[],
       failingSubjects: academicRecords.length > 0 && academicRecords[0].exams && typeof academicRecords[0].exams === 'string'
         ? JSON.parse(academicRecords[0].exams).filter((e: any) => e.grade && e.grade < 50).length 
         : 0,
