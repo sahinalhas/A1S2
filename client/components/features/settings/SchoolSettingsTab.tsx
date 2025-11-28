@@ -273,7 +273,10 @@ export default function SchoolSettingsTab() {
                 <Info className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
                 <div className="space-y-2">
                   <h3 className="font-semibold text-sm text-emerald-900 dark:text-emerald-100">Birden Fazla Okulda Görevli misiniz?</h3>
-                  <p className="text-xs text-emerald-800 dark:text-emerald-200">Farklı okullarda görev yapıyorsanız, her birini sisteme ayrı ayrı ekleyebilirsiniz. Sağ üstte bulunan okul seçicide kolayca okul değiştirebilirsiniz.</p>
+                  <div className="text-xs text-emerald-800 dark:text-emerald-200 space-y-2">
+                    <p>Birden fazla okulda görevliyseniz, her okulu sisteme ayrı olarak eklemeniz gerekmektedir. Sağ üstte bulunan okul seçici aracılığıyla okullar arasında geçiş yapabilir ve her okulun işlem, kayıt ve verilerini kendi içinde düzenli bir şekilde yürütebilirsiniz.</p>
+                    <p>Her okul için yapılacak işlemler birbirinden bağımsız olarak yönetilir.</p>
+                  </div>
                 </div>
               </div>
             </CardContent>
