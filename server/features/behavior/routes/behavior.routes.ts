@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import * as service from '../services/behavior.service.js';
 import { autoSyncHooks } from '../../profile-sync/services/auto-sync-hooks.service.js';
 import { validateSchoolAccess } from '../../../middleware/school-access.middleware.js';
@@ -7,10 +7,26 @@ import type { SchoolScopedRequest } from '../../../middleware/school-access.midd
 const router = Router();
 router.use(validateSchoolAccess);
 
-router.get('/:studentId', (req, res) => {
+function getSchoolId(req: Request): string | null {
+  return (req as SchoolScopedRequest).schoolId || null;
+}
+
+router.get('/:studentId', (req: Request, res: Response) => {
   try {
+    const schoolId = getSchoolId(req);
+    if (!schoolId) {
+      return res.status(400).json({ error: 'School ID required' });
+    }
+    
     const { studentId } = req.params;
-    const incidents = service.getBehaviorIncidentsByStudent(studentId);
+    
+    if (!service.studentBelongsToSchool(studentId, schoolId)) {
+      return res.status(403).json({ 
+        error: 'Bu öğrenci seçili okula ait değil' 
+      });
+    }
+    
+    const incidents = service.getBehaviorIncidentsByStudentAndSchool(studentId, schoolId);
     res.json(incidents);
   } catch (error) {
     console.error('Error fetching behavior incidents:', error);
@@ -18,10 +34,22 @@ router.get('/:studentId', (req, res) => {
   }
 });
 
-router.get('/:studentId/stats', (req, res) => {
+router.get('/:studentId/stats', (req: Request, res: Response) => {
   try {
+    const schoolId = getSchoolId(req);
+    if (!schoolId) {
+      return res.status(400).json({ error: 'School ID required' });
+    }
+    
     const { studentId } = req.params;
-    const stats = service.getBehaviorStatsByStudent(studentId);
+    
+    if (!service.studentBelongsToSchool(studentId, schoolId)) {
+      return res.status(403).json({ 
+        error: 'Bu öğrenci seçili okula ait değil' 
+      });
+    }
+    
+    const stats = service.getBehaviorStatsByStudentAndSchool(studentId, schoolId);
     res.json(stats);
   } catch (error) {
     console.error('Error fetching behavior stats:', error);
@@ -29,13 +57,30 @@ router.get('/:studentId/stats', (req, res) => {
   }
 });
 
-router.post('/', (req, res) => {
+router.post('/', (req: Request, res: Response) => {
   try {
-    const incident = req.body;
-    const result = service.addBehaviorIncident(incident);
+    const schoolId = getSchoolId(req);
+    if (!schoolId) {
+      return res.status(400).json({ error: 'School ID required' });
+    }
     
-    // 🔥 OTOMATIK PROFİL SENKRONIZASYONU - Davranış kaydı eklendiğinde profili güncelle
-    if (result.success && incident.studentId && incident.id) {
+    const incident = req.body;
+    
+    if (!service.studentBelongsToSchool(incident.studentId, schoolId)) {
+      return res.status(403).json({ 
+        error: 'Bu öğrenci seçili okula ait değil' 
+      });
+    }
+    
+    const result = service.addBehaviorIncidentWithSchoolCheck(incident, schoolId);
+    
+    if (!result.success) {
+      return res.status(403).json({ 
+        error: 'Davranış kaydı eklenemedi - öğrenci bu okula ait değil' 
+      });
+    }
+    
+    if (incident.studentId && incident.id) {
       autoSyncHooks.onBehaviorIncidentRecorded({
         id: incident.id,
         studentId: incident.studentId,
@@ -56,11 +101,24 @@ router.post('/', (req, res) => {
   }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', (req: Request, res: Response) => {
   try {
+    const schoolId = getSchoolId(req);
+    if (!schoolId) {
+      return res.status(400).json({ error: 'School ID required' });
+    }
+    
     const { id } = req.params;
     const updates = req.body;
-    const result = service.updateBehaviorIncident(id, updates);
+    
+    const result = service.updateBehaviorIncidentBySchool(id, updates, schoolId);
+    
+    if (!result.success) {
+      return res.status(404).json({ 
+        error: 'Davranış kaydı bulunamadı veya bu okula ait değil' 
+      });
+    }
+    
     res.json(result);
   } catch (error) {
     console.error('Error updating behavior incident:', error);
@@ -68,10 +126,23 @@ router.put('/:id', (req, res) => {
   }
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', (req: Request, res: Response) => {
   try {
+    const schoolId = getSchoolId(req);
+    if (!schoolId) {
+      return res.status(400).json({ error: 'School ID required' });
+    }
+    
     const { id } = req.params;
-    const result = service.deleteBehaviorIncident(id);
+    
+    const result = service.deleteBehaviorIncidentBySchool(id, schoolId);
+    
+    if (!result.success) {
+      return res.status(404).json({ 
+        error: 'Davranış kaydı bulunamadı veya bu okula ait değil' 
+      });
+    }
+    
     res.json(result);
   } catch (error) {
     console.error('Error deleting behavior incident:', error);

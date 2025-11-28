@@ -372,3 +372,363 @@ export function getAlertStatistics(): unknown[] {
     throw error;
   }
 }
+
+// ================= SCHOOL-SCOPED FUNCTIONS =================
+
+export function getAllAlertsBySchool(schoolId: string): EarlyWarningAlert[] {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      SELECT ewa.* FROM early_warning_alerts ewa
+      JOIN students s ON ewa.studentId = s.id
+      WHERE s.school_id = ?
+      ORDER BY ewa.created_at DESC
+    `);
+    return stmt.all(schoolId) as EarlyWarningAlert[];
+  } catch (error) {
+    console.error('Database error in getAllAlertsBySchool:', error);
+    return [];
+  }
+}
+
+export function getAlertsByStudentAndSchool(studentId: string, schoolId: string): EarlyWarningAlert[] {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      SELECT ewa.* FROM early_warning_alerts ewa
+      JOIN students s ON ewa.studentId = s.id
+      WHERE ewa.studentId = ? AND s.school_id = ?
+      ORDER BY ewa.created_at DESC
+    `);
+    return stmt.all(studentId, schoolId) as EarlyWarningAlert[];
+  } catch (error) {
+    console.error('Database error in getAlertsByStudentAndSchool:', error);
+    return [];
+  }
+}
+
+export function getAlertByIdAndSchool(id: string, schoolId: string): EarlyWarningAlert | null {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      SELECT ewa.* FROM early_warning_alerts ewa
+      JOIN students s ON ewa.studentId = s.id
+      WHERE ewa.id = ? AND s.school_id = ?
+    `);
+    return stmt.get(id, schoolId) as EarlyWarningAlert | null;
+  } catch (error) {
+    console.error('Database error in getAlertByIdAndSchool:', error);
+    return null;
+  }
+}
+
+export function updateAlertStatusBySchool(id: string, status: string, schoolId: string): boolean {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      UPDATE early_warning_alerts 
+      SET status = ?, updated_at = CURRENT_TIMESTAMP 
+      WHERE id = ? AND studentId IN (SELECT id FROM students WHERE school_id = ?)
+    `);
+    const result = stmt.run(status, id, schoolId);
+    return result.changes > 0;
+  } catch (error) {
+    console.error('Database error in updateAlertStatusBySchool:', error);
+    return false;
+  }
+}
+
+export function updateAlertBySchool(id: string, updates: Partial<EarlyWarningAlert>, schoolId: string): boolean {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      UPDATE early_warning_alerts 
+      SET assignedTo = ?, reviewedAt = ?, resolvedAt = ?, resolution = ?, notes = ?, status = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND studentId IN (SELECT id FROM students WHERE school_id = ?)
+    `);
+    const result = stmt.run(
+      updates.assignedTo,
+      updates.reviewedAt,
+      updates.resolvedAt,
+      updates.resolution,
+      updates.notes,
+      updates.status,
+      id,
+      schoolId
+    );
+    return result.changes > 0;
+  } catch (error) {
+    console.error('Database error in updateAlertBySchool:', error);
+    return false;
+  }
+}
+
+export function deleteAlertBySchool(id: string, schoolId: string): boolean {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      DELETE FROM early_warning_alerts 
+      WHERE id = ? AND studentId IN (SELECT id FROM students WHERE school_id = ?)
+    `);
+    const result = stmt.run(id, schoolId);
+    return result.changes > 0;
+  } catch (error) {
+    console.error('Database error in deleteAlertBySchool:', error);
+    return false;
+  }
+}
+
+export function getRecommendationsByStudentAndSchool(studentId: string, schoolId: string): InterventionRecommendation[] {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      SELECT ir.* FROM intervention_recommendations ir
+      JOIN students s ON ir.studentId = s.id
+      WHERE ir.studentId = ? AND s.school_id = ?
+      ORDER BY ir.priority ASC, ir.created_at DESC
+    `);
+    return stmt.all(studentId, schoolId) as InterventionRecommendation[];
+  } catch (error) {
+    console.error('Database error in getRecommendationsByStudentAndSchool:', error);
+    return [];
+  }
+}
+
+export function getRecommendationsByAlertAndSchool(alertId: string, schoolId: string): InterventionRecommendation[] {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      SELECT ir.* FROM intervention_recommendations ir
+      JOIN early_warning_alerts ewa ON ir.alertId = ewa.id
+      JOIN students s ON ewa.studentId = s.id
+      WHERE ir.alertId = ? AND s.school_id = ?
+      ORDER BY ir.priority ASC
+    `);
+    return stmt.all(alertId, schoolId) as InterventionRecommendation[];
+  } catch (error) {
+    console.error('Database error in getRecommendationsByAlertAndSchool:', error);
+    return [];
+  }
+}
+
+export function getActiveRecommendationsBySchool(schoolId: string): InterventionRecommendation[] {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      SELECT ir.* FROM intervention_recommendations ir
+      JOIN students s ON ir.studentId = s.id
+      WHERE s.school_id = ? AND ir.status IN ('ÖNERİLDİ', 'PLANLANDI', 'UYGULANMAKTA')
+      ORDER BY ir.priority ASC, ir.created_at DESC
+    `);
+    return stmt.all(schoolId) as InterventionRecommendation[];
+  } catch (error) {
+    console.error('Database error in getActiveRecommendationsBySchool:', error);
+    return [];
+  }
+}
+
+export function updateRecommendationStatusBySchool(id: string, status: string, schoolId: string): boolean {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      UPDATE intervention_recommendations 
+      SET status = ?, updated_at = CURRENT_TIMESTAMP 
+      WHERE id = ? AND studentId IN (SELECT id FROM students WHERE school_id = ?)
+    `);
+    const result = stmt.run(status, id, schoolId);
+    return result.changes > 0;
+  } catch (error) {
+    console.error('Database error in updateRecommendationStatusBySchool:', error);
+    return false;
+  }
+}
+
+export function updateRecommendationBySchool(id: string, updates: Partial<InterventionRecommendation>, schoolId: string): boolean {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      UPDATE intervention_recommendations 
+      SET implementedBy = ?, implementedAt = ?, effectiveness = ?, followUpDate = ?, notes = ?, status = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND studentId IN (SELECT id FROM students WHERE school_id = ?)
+    `);
+    const result = stmt.run(
+      updates.implementedBy,
+      updates.implementedAt,
+      updates.effectiveness,
+      updates.followUpDate,
+      updates.notes,
+      updates.status,
+      id,
+      schoolId
+    );
+    return result.changes > 0;
+  } catch (error) {
+    console.error('Database error in updateRecommendationBySchool:', error);
+    return false;
+  }
+}
+
+export function deleteRecommendationBySchool(id: string, schoolId: string): boolean {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      DELETE FROM intervention_recommendations 
+      WHERE id = ? AND studentId IN (SELECT id FROM students WHERE school_id = ?)
+    `);
+    const result = stmt.run(id, schoolId);
+    return result.changes > 0;
+  } catch (error) {
+    console.error('Database error in deleteRecommendationBySchool:', error);
+    return false;
+  }
+}
+
+export function getHighRiskStudentsBySchool(schoolId: string): unknown[] {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      SELECT rsh.studentId, (s.name || ' ' || s.surname) as name, s.class as className, rsh.overallRiskScore, rsh.riskLevel, rsh.assessmentDate
+      FROM risk_score_history rsh
+      JOIN students s ON rsh.studentId = s.id
+      WHERE s.school_id = ? AND rsh.id IN (
+        SELECT id FROM risk_score_history r1
+        WHERE r1.studentId = rsh.studentId
+        ORDER BY r1.assessmentDate DESC
+        LIMIT 1
+      )
+      AND rsh.riskLevel IN ('YÜKSEK', 'KRİTİK')
+      ORDER BY rsh.overallRiskScore DESC
+    `);
+    return stmt.all(schoolId);
+  } catch (error) {
+    console.error('Database error in getHighRiskStudentsBySchool:', error);
+    return [];
+  }
+}
+
+export function getAlertStatisticsBySchool(schoolId: string): unknown[] {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      SELECT 
+        ewa.alertLevel,
+        COUNT(*) as count
+      FROM early_warning_alerts ewa
+      JOIN students s ON ewa.studentId = s.id
+      WHERE s.school_id = ? AND ewa.status IN ('AÇIK', 'İNCELENİYOR')
+      GROUP BY ewa.alertLevel
+    `);
+    return stmt.all(schoolId);
+  } catch (error) {
+    console.error('Database error in getAlertStatisticsBySchool:', error);
+    return [];
+  }
+}
+
+export function getDashboardSummaryBySchool(schoolId: string): {
+  totalAlerts: number;
+  criticalAlerts: number;
+  highRiskStudents: number;
+  pendingRecommendations: number;
+} {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    
+    const totalAlertsStmt = db.prepare(`
+      SELECT COUNT(*) as count FROM early_warning_alerts ewa
+      JOIN students s ON ewa.studentId = s.id
+      WHERE s.school_id = ? AND ewa.status IN ('AÇIK', 'İNCELENİYOR')
+    `);
+    
+    const criticalAlertsStmt = db.prepare(`
+      SELECT COUNT(*) as count FROM early_warning_alerts ewa
+      JOIN students s ON ewa.studentId = s.id
+      WHERE s.school_id = ? AND ewa.alertLevel = 'KRİTİK' AND ewa.status IN ('AÇIK', 'İNCELENİYOR')
+    `);
+    
+    const highRiskStudentsStmt = db.prepare(`
+      SELECT COUNT(DISTINCT rsh.studentId) as count 
+      FROM risk_score_history rsh
+      JOIN students s ON rsh.studentId = s.id
+      WHERE s.school_id = ? AND rsh.riskLevel IN ('YÜKSEK', 'KRİTİK')
+    `);
+    
+    const pendingRecommendationsStmt = db.prepare(`
+      SELECT COUNT(*) as count FROM intervention_recommendations ir
+      JOIN students s ON ir.studentId = s.id
+      WHERE s.school_id = ? AND ir.status IN ('ÖNERİLDİ', 'PLANLANDI')
+    `);
+    
+    const totalAlerts = (totalAlertsStmt.get(schoolId) as { count: number })?.count || 0;
+    const criticalAlerts = (criticalAlertsStmt.get(schoolId) as { count: number })?.count || 0;
+    const highRiskStudents = (highRiskStudentsStmt.get(schoolId) as { count: number })?.count || 0;
+    const pendingRecommendations = (pendingRecommendationsStmt.get(schoolId) as { count: number })?.count || 0;
+    
+    return { totalAlerts, criticalAlerts, highRiskStudents, pendingRecommendations };
+  } catch (error) {
+    console.error('Database error in getDashboardSummaryBySchool:', error);
+    return { totalAlerts: 0, criticalAlerts: 0, highRiskStudents: 0, pendingRecommendations: 0 };
+  }
+}
+
+export function getRiskScoreHistoryBySchool(studentId: string, schoolId: string): RiskScoreHistory[] {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      SELECT rsh.* FROM risk_score_history rsh
+      JOIN students s ON rsh.studentId = s.id
+      WHERE rsh.studentId = ? AND s.school_id = ?
+      ORDER BY rsh.assessmentDate DESC
+    `);
+    return stmt.all(studentId, schoolId) as RiskScoreHistory[];
+  } catch (error) {
+    console.error('Database error in getRiskScoreHistoryBySchool:', error);
+    return [];
+  }
+}
+
+export function getLatestRiskScoreBySchool(studentId: string, schoolId: string): RiskScoreHistory | null {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      SELECT rsh.* FROM risk_score_history rsh
+      JOIN students s ON rsh.studentId = s.id
+      WHERE rsh.studentId = ? AND s.school_id = ?
+      ORDER BY rsh.assessmentDate DESC
+      LIMIT 1
+    `);
+    return stmt.get(studentId, schoolId) as RiskScoreHistory | null;
+  } catch (error) {
+    console.error('Database error in getLatestRiskScoreBySchool:', error);
+    return null;
+  }
+}
+
+export function studentBelongsToSchool(studentId: string, schoolId: string): boolean {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare('SELECT 1 FROM students WHERE id = ? AND school_id = ?');
+    return !!stmt.get(studentId, schoolId);
+  } catch (error) {
+    console.error('Database error in studentBelongsToSchool:', error);
+    return false;
+  }
+}

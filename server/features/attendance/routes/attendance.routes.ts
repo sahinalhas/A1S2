@@ -1,9 +1,22 @@
-import { RequestHandler } from 'express';
+import { RequestHandler, Request } from 'express';
 import * as attendanceService from '../services/attendance.service.js';
 import { randomUUID } from 'crypto';
+import type { SchoolScopedRequest } from '../../../middleware/school-access.middleware.js';
+
+function getSchoolId(req: Request): string | null {
+  return (req as SchoolScopedRequest).schoolId || null;
+}
 
 export const getAttendanceByStudent: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
+    if (!schoolId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "School ID required" 
+      });
+    }
+    
     const { studentId } = req.params;
     
     if (!studentId || typeof studentId !== 'string' || studentId.length > 50) {
@@ -13,7 +26,14 @@ export const getAttendanceByStudent: RequestHandler = (req, res) => {
       });
     }
     
-    const attendance = attendanceService.getStudentAttendance(studentId);
+    if (!attendanceService.studentBelongsToSchool(studentId, schoolId)) {
+      return res.status(403).json({ 
+        success: false, 
+        error: "Bu öğrenci seçili okula ait değil" 
+      });
+    }
+    
+    const attendance = attendanceService.getStudentAttendanceBySchool(studentId, schoolId);
     res.json(attendance);
   } catch (error) {
     console.error('Error fetching attendance:', error);
@@ -32,6 +52,14 @@ export const getAttendanceByStudent: RequestHandler = (req, res) => {
 
 export const getAllAttendance: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
+    if (!schoolId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "School ID required" 
+      });
+    }
+    
     res.json([]);
   } catch (error) {
     console.error('Error fetching all attendance:', error);
@@ -41,13 +69,35 @@ export const getAllAttendance: RequestHandler = (req, res) => {
 
 export const saveAttendance: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
+    if (!schoolId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "School ID required" 
+      });
+    }
+    
     const attendance = req.body;
     
     if (!attendance.id) {
       attendance.id = randomUUID();
     }
     
-    attendanceService.createAttendance(attendance, attendance.id);
+    if (!attendanceService.studentBelongsToSchool(attendance.studentId, schoolId)) {
+      return res.status(403).json({ 
+        success: false, 
+        error: "Bu öğrenci seçili okula ait değil" 
+      });
+    }
+    
+    const result = attendanceService.createAttendanceWithSchoolCheck(attendance, attendance.id, schoolId);
+    
+    if (!result.success) {
+      return res.status(403).json({ 
+        success: false, 
+        error: result.error || 'Devam kaydı eklenemedi' 
+      });
+    }
     
     res.json({ success: true, message: 'Devam kaydı başarıyla eklendi' });
   } catch (error) {

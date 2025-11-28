@@ -44,3 +44,40 @@ export function insertAttendance(id: string, studentId: string, date: string, st
     throw error;
   }
 }
+
+// ================= SCHOOL-SCOPED FUNCTIONS =================
+
+export function studentBelongsToSchool(studentId: string, schoolId: string): boolean {
+  const db = getDatabase();
+  const stmt = db.prepare('SELECT 1 FROM students WHERE id = ? AND school_id = ?');
+  return !!stmt.get(studentId, schoolId);
+}
+
+export function getAttendanceByStudentAndSchool(studentId: string, schoolId: string): AttendanceRecord[] {
+  try {
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      SELECT a.* FROM attendance a
+      JOIN students s ON a.studentId = s.id
+      WHERE a.studentId = ? AND s.school_id = ?
+      ORDER BY a.date DESC
+    `);
+    return stmt.all(studentId, schoolId) as AttendanceRecord[];
+  } catch (error) {
+    console.error('Database error in getAttendanceByStudentAndSchool:', error);
+    return [];
+  }
+}
+
+export function insertAttendanceWithSchoolCheck(id: string, studentId: string, date: string, status: string, notes: string | null, schoolId: string): boolean {
+  try {
+    if (!studentBelongsToSchool(studentId, schoolId)) {
+      return false;
+    }
+    insertAttendance(id, studentId, date, status, notes);
+    return true;
+  } catch (error) {
+    console.error('Error inserting attendance with school check:', error);
+    return false;
+  }
+}

@@ -110,15 +110,15 @@ export function getAllAlerts() {
 }
 
 export function getAllAlertsBySchool(schoolId: string) {
-  const studentRepo = require('../../students/repository/students.repository.js');
-  const students = studentRepo.loadStudentsBySchool(schoolId);
-  const studentIds = students.map((s: any) => s.id);
-  const allAlerts = repository.getAllAlerts();
-  return allAlerts.filter((a: any) => studentIds.includes(a.studentId));
+  return repository.getAllAlertsBySchool(schoolId);
 }
 
 export function getAlertsByStudent(studentId: string) {
   return repository.getAlertsByStudent(studentId);
+}
+
+export function getAlertsByStudentAndSchool(studentId: string, schoolId: string) {
+  return repository.getAlertsByStudentAndSchool(studentId, schoolId);
 }
 
 export function getActiveAlerts() {
@@ -138,9 +138,18 @@ export function getAlertById(id: string) {
   return repository.getAlertById(id);
 }
 
+export function getAlertByIdAndSchool(id: string, schoolId: string) {
+  return repository.getAlertByIdAndSchool(id, schoolId);
+}
+
 export function updateAlertStatus(id: string, status: string) {
   repository.updateAlertStatus(id, status);
   return { success: true };
+}
+
+export function updateAlertStatusBySchool(id: string, status: string, schoolId: string) {
+  const success = repository.updateAlertStatusBySchool(id, status, schoolId);
+  return { success };
 }
 
 export function updateAlert(id: string, updates: any) {
@@ -148,21 +157,43 @@ export function updateAlert(id: string, updates: any) {
   return { success: true };
 }
 
+export function updateAlertBySchool(id: string, updates: any, schoolId: string) {
+  const success = repository.updateAlertBySchool(id, updates, schoolId);
+  return { success };
+}
+
 export function deleteAlert(id: string) {
   repository.deleteAlert(id);
   return { success: true };
+}
+
+export function deleteAlertBySchool(id: string, schoolId: string) {
+  const success = repository.deleteAlertBySchool(id, schoolId);
+  return { success };
 }
 
 export function getRecommendationsByStudent(studentId: string) {
   return repository.getRecommendationsByStudent(studentId);
 }
 
+export function getRecommendationsByStudentAndSchool(studentId: string, schoolId: string) {
+  return repository.getRecommendationsByStudentAndSchool(studentId, schoolId);
+}
+
 export function getRecommendationsByAlert(alertId: string) {
   return repository.getRecommendationsByAlert(alertId);
 }
 
+export function getRecommendationsByAlertAndSchool(alertId: string, schoolId: string) {
+  return repository.getRecommendationsByAlertAndSchool(alertId, schoolId);
+}
+
 export function getActiveRecommendations() {
   return repository.getActiveRecommendations();
+}
+
+export function getActiveRecommendationsBySchool(schoolId: string) {
+  return repository.getActiveRecommendationsBySchool(schoolId);
 }
 
 export function updateRecommendationStatus(id: string, status: string) {
@@ -170,9 +201,19 @@ export function updateRecommendationStatus(id: string, status: string) {
   return { success: true };
 }
 
+export function updateRecommendationStatusBySchool(id: string, status: string, schoolId: string) {
+  const success = repository.updateRecommendationStatusBySchool(id, status, schoolId);
+  return { success };
+}
+
 export function updateRecommendation(id: string, updates: any) {
   repository.updateRecommendation(id, updates);
   return { success: true };
+}
+
+export function updateRecommendationBySchool(id: string, updates: any, schoolId: string) {
+  const success = repository.updateRecommendationBySchool(id, updates, schoolId);
+  return { success };
 }
 
 export function deleteRecommendation(id: string) {
@@ -180,12 +221,25 @@ export function deleteRecommendation(id: string) {
   return { success: true };
 }
 
+export function deleteRecommendationBySchool(id: string, schoolId: string) {
+  const success = repository.deleteRecommendationBySchool(id, schoolId);
+  return { success };
+}
+
 export function getHighRiskStudents() {
   return repository.getHighRiskStudents();
 }
 
+export function getHighRiskStudentsBySchool(schoolId: string) {
+  return repository.getHighRiskStudentsBySchool(schoolId);
+}
+
 export function getAlertStatistics() {
   return repository.getAlertStatistics();
+}
+
+export function getAlertStatisticsBySchool(schoolId: string) {
+  return repository.getAlertStatisticsBySchool(schoolId);
 }
 
 export function getDashboardSummary() {
@@ -216,4 +270,46 @@ export function getDashboardSummary() {
       topRiskStudents: []
     };
   }
+}
+
+export function getDashboardSummaryBySchool(schoolId: string) {
+  try {
+    const activeAlerts = repository.getActiveAlertsBySchool(schoolId);
+    const highRiskStudents = repository.getHighRiskStudentsBySchool(schoolId);
+    const activeRecommendations = repository.getActiveRecommendationsBySchool(schoolId);
+    const alertStats = repository.getAlertStatisticsBySchool(schoolId);
+    
+    return {
+      totalActiveAlerts: activeAlerts.length,
+      highRiskStudentCount: highRiskStudents.length,
+      pendingRecommendations: activeRecommendations.filter(r => r.status === 'ÖNERİLDİ').length,
+      criticalAlerts: activeAlerts.filter(a => a.alertLevel === 'KRİTİK').length,
+      alertsByLevel: alertStats,
+      recentAlerts: activeAlerts.slice(0, 5),
+      topRiskStudents: highRiskStudents.slice(0, 10)
+    };
+  } catch (error) {
+    console.error('Error getting dashboard summary by school:', error);
+    return {
+      totalActiveAlerts: 0,
+      highRiskStudentCount: 0,
+      pendingRecommendations: 0,
+      criticalAlerts: 0,
+      alertsByLevel: [],
+      recentAlerts: [],
+      topRiskStudents: []
+    };
+  }
+}
+
+export function getRiskScoreHistoryBySchool(studentId: string, schoolId: string) {
+  return repository.getRiskScoreHistoryBySchool(studentId, schoolId);
+}
+
+export function getLatestRiskScoreBySchool(studentId: string, schoolId: string) {
+  return repository.getLatestRiskScoreBySchool(studentId, schoolId);
+}
+
+export function studentBelongsToSchool(studentId: string, schoolId: string): boolean {
+  return repository.studentBelongsToSchool(studentId, schoolId);
 }

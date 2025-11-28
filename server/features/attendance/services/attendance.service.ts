@@ -52,3 +52,48 @@ export function createAttendance(attendance: any, generatedId: string): void {
     notes
   );
 }
+
+// ================= SCHOOL-SCOPED FUNCTIONS =================
+
+export function studentBelongsToSchool(studentId: string, schoolId: string): boolean {
+  return repository.studentBelongsToSchool(studentId, schoolId);
+}
+
+export function getStudentAttendanceBySchool(studentId: string, schoolId: string): AttendanceRecord[] {
+  if (!studentId || typeof studentId !== 'string' || studentId.length > 50) {
+    throw new Error("Geçersiz öğrenci ID");
+  }
+  
+  const records = repository.getAttendanceByStudentAndSchool(studentId, schoolId);
+  
+  return records.map((record: any) => ({
+    ...record,
+    reason: record.notes,
+    notes: undefined
+  }));
+}
+
+export function createAttendanceWithSchoolCheck(attendance: any, generatedId: string, schoolId: string): { success: boolean; error?: string } {
+  const validation = validateAttendance(attendance);
+  if (!validation.valid) {
+    return { success: false, error: validation.error };
+  }
+  
+  const id = attendance.id || generatedId;
+  const notes = attendance.reason || attendance.notes || null;
+  
+  const result = repository.insertAttendanceWithSchoolCheck(
+    id,
+    attendance.studentId,
+    attendance.date,
+    attendance.status,
+    notes,
+    schoolId
+  );
+  
+  if (!result) {
+    return { success: false, error: 'Öğrenci bu okula ait değil' };
+  }
+  
+  return { success: true };
+}
