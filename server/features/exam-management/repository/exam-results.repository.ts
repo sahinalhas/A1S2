@@ -17,6 +17,11 @@ function ensureInitialized(): void {
   
   statements = {
     getById: db.prepare('SELECT * FROM exam_session_results WHERE id = ?'),
+    getByIdAndSchool: db.prepare(`
+      SELECT er.* FROM exam_session_results er
+      INNER JOIN exam_sessions sess ON er.session_id = sess.id
+      WHERE er.id = ? AND sess.school_id = ?
+    `),
     getPenaltyDivisor: db.prepare(`
       SELECT et.penalty_divisor
       FROM exam_sessions sess
@@ -39,6 +44,22 @@ function ensureInitialized(): void {
       WHERE er.session_id = ?
       ORDER BY s.name, es.order_index
     `),
+    getBySessionAndSchool: db.prepare(`
+      SELECT 
+        er.*,
+        s.name as student_name,
+        es.subject_name,
+        sess.name as session_name,
+        sess.exam_type_id,
+        et.penalty_divisor
+      FROM exam_session_results er
+      LEFT JOIN students s ON er.student_id = s.id
+      LEFT JOIN exam_subjects es ON er.subject_id = es.id
+      INNER JOIN exam_sessions sess ON er.session_id = sess.id
+      LEFT JOIN exam_types et ON sess.exam_type_id = et.id
+      WHERE er.session_id = ? AND sess.school_id = ?
+      ORDER BY s.name, es.order_index
+    `),
     getByStudent: db.prepare(`
       SELECT 
         er.*,
@@ -54,6 +75,23 @@ function ensureInitialized(): void {
       LEFT JOIN exam_sessions sess ON er.session_id = sess.id
       LEFT JOIN exam_types et ON sess.exam_type_id = et.id
       WHERE er.student_id = ?
+      ORDER BY sess.exam_date DESC, es.order_index
+    `),
+    getByStudentAndSchool: db.prepare(`
+      SELECT 
+        er.*,
+        s.name as student_name,
+        es.subject_name,
+        sess.name as session_name,
+        sess.exam_type_id,
+        sess.exam_date,
+        et.penalty_divisor
+      FROM exam_session_results er
+      LEFT JOIN students s ON er.student_id = s.id
+      LEFT JOIN exam_subjects es ON er.subject_id = es.id
+      INNER JOIN exam_sessions sess ON er.session_id = sess.id
+      LEFT JOIN exam_types et ON sess.exam_type_id = et.id
+      WHERE er.student_id = ? AND sess.school_id = ? AND s.schoolId = ?
       ORDER BY sess.exam_date DESC, es.order_index
     `),
     getBySessionAndStudent: db.prepare(`
@@ -76,6 +114,12 @@ function ensureInitialized(): void {
       SET correct_count = ?, wrong_count = ?, empty_count = ?, 
           net_score = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
+    `),
+    updateBySchool: db.prepare(`
+      UPDATE exam_session_results 
+      SET correct_count = ?, wrong_count = ?, empty_count = ?, 
+          net_score = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND session_id IN (SELECT id FROM exam_sessions WHERE school_id = ?)
     `),
     upsert: db.prepare(`
       INSERT INTO exam_session_results (
@@ -118,6 +162,20 @@ export function getExamResultById(id: string): ExamResult | null {
   }
 }
 
+export function getExamResultByIdAndSchool(id: string, schoolId: string): ExamResult | null {
+  if (!schoolId) {
+    throw new Error('schoolId is required for getExamResultByIdAndSchool');
+  }
+  try {
+    ensureInitialized();
+    const result = statements.getByIdAndSchool.get(id, schoolId);
+    return result ? (result as ExamResult) : null;
+  } catch (error) {
+    console.error('Database error in getExamResultByIdAndSchool:', error);
+    return null;
+  }
+}
+
 export function getExamResultsBySession(sessionId: string): ExamResultWithDetails[] {
   try {
     ensureInitialized();
@@ -128,12 +186,38 @@ export function getExamResultsBySession(sessionId: string): ExamResultWithDetail
   }
 }
 
+export function getExamResultsBySessionAndSchool(sessionId: string, schoolId: string): ExamResultWithDetails[] {
+  if (!schoolId) {
+    throw new Error('schoolId is required for getExamResultsBySessionAndSchool');
+  }
+  try {
+    ensureInitialized();
+    return statements.getBySessionAndSchool.all(sessionId, schoolId) as ExamResultWithDetails[];
+  } catch (error) {
+    console.error('Database error in getExamResultsBySessionAndSchool:', error);
+    return [];
+  }
+}
+
 export function getExamResultsByStudent(studentId: string): ExamResultWithDetails[] {
   try {
     ensureInitialized();
     return statements.getByStudent.all(studentId) as ExamResultWithDetails[];
   } catch (error) {
     console.error('Database error in getExamResultsByStudent:', error);
+    return [];
+  }
+}
+
+export function getExamResultsByStudentAndSchool(studentId: string, schoolId: string): ExamResultWithDetails[] {
+  if (!schoolId) {
+    throw new Error('schoolId is required for getExamResultsByStudentAndSchool');
+  }
+  try {
+    ensureInitialized();
+    return statements.getByStudentAndSchool.all(studentId, schoolId, schoolId) as ExamResultWithDetails[];
+  } catch (error) {
+    console.error('Database error in getExamResultsByStudentAndSchool:', error);
     return [];
   }
 }

@@ -34,6 +34,7 @@ export function createExamManagementTables(db: Database.Database): void {
   `);
 
   // Deneme Sınavları (1. Deneme, 2. Deneme vb.)
+  // Not: Yeni tablolar için school_id dahil
   db.exec(`
     CREATE TABLE IF NOT EXISTS exam_sessions (
       id TEXT PRIMARY KEY,
@@ -50,6 +51,37 @@ export function createExamManagementTables(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_exam_sessions_type ON exam_sessions(exam_type_id);
     CREATE INDEX IF NOT EXISTS idx_exam_sessions_date ON exam_sessions(exam_date);
   `);
+
+  // Migration: Add school_id column to exam_sessions if it doesn't exist
+  try {
+    const columnCheck = db.prepare(`PRAGMA table_info(exam_sessions)`).all() as Array<{ name: string }>;
+    const hasSchoolId = columnCheck.some(col => col.name === 'school_id');
+    
+    if (!hasSchoolId) {
+      db.exec(`ALTER TABLE exam_sessions ADD COLUMN school_id TEXT DEFAULT 'school-default-001';`);
+      console.log('✅ Added school_id column to exam_sessions');
+    }
+  } catch (err: any) {
+    if (!err.message?.includes('duplicate column')) {
+      console.warn('Warning adding school_id column to exam_sessions:', err.message);
+    }
+  }
+
+  // Update existing exam sessions with default school_id
+  try {
+    db.exec(`UPDATE exam_sessions SET school_id = 'school-default-001' WHERE school_id IS NULL OR school_id = '';`);
+  } catch (err: any) {
+    console.warn('Warning updating exam_sessions school_id:', err.message);
+  }
+
+  // Create index for school_id (after column exists)
+  try {
+    db.exec(`CREATE INDEX IF NOT EXISTS idx_exam_sessions_school ON exam_sessions(school_id);`);
+  } catch (err: any) {
+    if (!err.message?.includes('already exists')) {
+      console.warn('Warning creating exam_sessions school_id index:', err.message);
+    }
+  }
 
   // Sınav Sonuçları (Öğrenci bazında, ders bazında D/Y/B)
   // Not: 'exam_session_results' adını kullanıyoruz çünkü 'exam_results' zaten academic.schema.ts'de var

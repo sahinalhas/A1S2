@@ -3,6 +3,7 @@ import * as examTypesRepo from '../repository/exam-types.repository.js';
 import * as examSessionsRepo from '../repository/exam-sessions.repository.js';
 import * as examResultsRepo from '../repository/exam-results.repository.js';
 import * as schoolExamsRepo from '../repository/school-exams.repository.js';
+import * as studentsService from '../../students/services/students.service.js';
 import * as statisticsService from '../services/statistics.service.js';
 import * as excelService from '../services/excel.service.js';
 import * as dashboardService from '../services/dashboard-overview.service.js';
@@ -10,8 +11,16 @@ import * as comparisonService from '../services/comparison.service.js';
 import * as aiAnalysisService from '../services/ai-analysis.service.js';
 import * as pdfReportService from '../services/pdf-report.service.js';
 import { sanitizeString } from '../../../middleware/validation.js';
-import { validateSchoolAccess } from '../../../middleware/school-access.middleware.js';
+import { validateSchoolAccess, type SchoolScopedRequest } from '../../../middleware/school-access.middleware.js';
 import { uploadExcelFile } from '../../../middleware/file-validation.middleware.js';
+
+function getSchoolId(req: Request): string {
+  const schoolId = (req as SchoolScopedRequest).schoolId;
+  if (!schoolId) {
+    throw new Error('School ID is required');
+  }
+  return schoolId;
+}
 
 export const getExamTypes: RequestHandler = (req, res) => {
   try {
@@ -36,10 +45,11 @@ export const getSubjectsByType: RequestHandler = (req, res) => {
 
 export const getAllExamSessions: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const { typeId } = req.query;
     const sessions = typeId 
-      ? examSessionsRepo.getExamSessionsByType(typeId as string)
-      : examSessionsRepo.getAllExamSessions();
+      ? examSessionsRepo.getExamSessionsByTypeAndSchool(typeId as string, schoolId)
+      : examSessionsRepo.getExamSessionsBySchool(schoolId);
     res.json({ success: true, data: sessions });
   } catch (error) {
     console.error('Error fetching exam sessions:', error);
@@ -49,8 +59,9 @@ export const getAllExamSessions: RequestHandler = (req, res) => {
 
 export const getExamSessionById: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const { id } = req.params;
-    const session = examSessionsRepo.getExamSessionById(id);
+    const session = examSessionsRepo.getExamSessionByIdAndSchool(id, schoolId);
     
     if (!session) {
       return res.status(404).json({ success: false, error: 'Deneme sınavı bulunamadı' });
@@ -65,6 +76,7 @@ export const getExamSessionById: RequestHandler = (req, res) => {
 
 export const createExamSession: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const input = req.body;
     
     if (!input.exam_type_id || !input.name || !input.exam_date) {
@@ -74,7 +86,7 @@ export const createExamSession: RequestHandler = (req, res) => {
       });
     }
     
-    const session = examSessionsRepo.createExamSession(input);
+    const session = examSessionsRepo.createExamSessionForSchool(input, schoolId);
     res.json({ success: true, data: session, message: 'Deneme sınavı oluşturuldu' });
   } catch (error) {
     console.error('Error creating exam session:', error);
@@ -84,15 +96,17 @@ export const createExamSession: RequestHandler = (req, res) => {
 
 export const updateExamSession: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const { id } = req.params;
     const input = req.body;
     
-    const session = examSessionsRepo.updateExamSession(id, input);
+    const session = examSessionsRepo.updateExamSessionForSchool(id, input, schoolId);
     res.json({ success: true, data: session, message: 'Deneme sınavı güncellendi' });
   } catch (error: unknown) {
     console.error('Error updating exam session:', error);
-    if (error instanceof Error ? error.message : String(error).includes('not found')) {
-      return res.status(404).json({ success: false, error: 'Deneme sınavı bulunamadı' });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes('not found') || errorMessage.includes('does not belong')) {
+      return res.status(404).json({ success: false, error: 'Deneme sınavı bulunamadı veya bu okula ait değil' });
     }
     res.status(500).json({ success: false, error: 'Deneme sınavı güncellenemedi' });
   }
@@ -100,8 +114,14 @@ export const updateExamSession: RequestHandler = (req, res) => {
 
 export const deleteExamSession: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const { id } = req.params;
-    examSessionsRepo.deleteExamSession(id);
+    const deleted = examSessionsRepo.deleteExamSessionBySchool(id, schoolId);
+    
+    if (!deleted) {
+      return res.status(404).json({ success: false, error: 'Deneme sınavı bulunamadı veya bu okula ait değil' });
+    }
+    
     res.json({ success: true, message: 'Deneme sınavı silindi' });
   } catch (error) {
     console.error('Error deleting exam session:', error);
@@ -111,8 +131,15 @@ export const deleteExamSession: RequestHandler = (req, res) => {
 
 export const getResultsBySession: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const { sessionId } = req.params;
-    const results = examResultsRepo.getExamResultsBySession(sessionId);
+    
+    const session = examSessionsRepo.getExamSessionByIdAndSchool(sessionId, schoolId);
+    if (!session) {
+      return res.status(403).json({ success: false, error: 'Bu oturum seçili okula ait değil' });
+    }
+    
+    const results = examResultsRepo.getExamResultsBySessionAndSchool(sessionId, schoolId);
     res.json({ success: true, data: results });
   } catch (error) {
     console.error('Error fetching results by session:', error);
@@ -122,8 +149,9 @@ export const getResultsBySession: RequestHandler = (req, res) => {
 
 export const getResultsByStudent: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const { studentId } = req.params;
-    const results = examResultsRepo.getExamResultsByStudent(studentId);
+    const results = examResultsRepo.getExamResultsByStudentAndSchool(studentId, schoolId);
     res.json({ success: true, data: results });
   } catch (error) {
     console.error('Error fetching results by student:', error);
@@ -133,7 +161,19 @@ export const getResultsByStudent: RequestHandler = (req, res) => {
 
 export const getResultsBySessionAndStudent: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const { sessionId, studentId } = req.params;
+    
+    const session = examSessionsRepo.getExamSessionByIdAndSchool(sessionId, schoolId);
+    if (!session) {
+      return res.status(403).json({ success: false, error: 'Bu oturum seçili okula ait değil' });
+    }
+    
+    const student = studentsService.getStudentByIdAndSchool(studentId, schoolId);
+    if (!student) {
+      return res.status(403).json({ success: false, error: 'Bu öğrenci seçili okula ait değil' });
+    }
+    
     const results = examResultsRepo.getExamResultsBySessionAndStudent(sessionId, studentId);
     res.json({ success: true, data: results });
   } catch (error) {
@@ -144,6 +184,7 @@ export const getResultsBySessionAndStudent: RequestHandler = (req, res) => {
 
 export const createExamResult: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const input = req.body;
     
     if (!input.session_id || !input.student_id || !input.subject_id) {
@@ -151,6 +192,16 @@ export const createExamResult: RequestHandler = (req, res) => {
         success: false, 
         error: 'Deneme, öğrenci ve ders bilgisi zorunludur' 
       });
+    }
+    
+    const session = examSessionsRepo.getExamSessionByIdAndSchool(input.session_id, schoolId);
+    if (!session) {
+      return res.status(403).json({ success: false, error: 'Bu oturum seçili okula ait değil' });
+    }
+    
+    const student = studentsService.getStudentByIdAndSchool(input.student_id, schoolId);
+    if (!student) {
+      return res.status(403).json({ success: false, error: 'Bu öğrenci seçili okula ait değil' });
     }
     
     const result = examResultsRepo.createExamResult(input);
@@ -166,6 +217,7 @@ export const createExamResult: RequestHandler = (req, res) => {
 
 export const upsertExamResult: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const input = req.body;
     
     if (!input.session_id || !input.student_id || !input.subject_id) {
@@ -173,6 +225,16 @@ export const upsertExamResult: RequestHandler = (req, res) => {
         success: false, 
         error: 'Deneme, öğrenci ve ders bilgisi zorunludur' 
       });
+    }
+    
+    const session = examSessionsRepo.getExamSessionByIdAndSchool(input.session_id, schoolId);
+    if (!session) {
+      return res.status(403).json({ success: false, error: 'Bu oturum seçili okula ait değil' });
+    }
+    
+    const student = studentsService.getStudentByIdAndSchool(input.student_id, schoolId);
+    if (!student) {
+      return res.status(403).json({ success: false, error: 'Bu öğrenci seçili okula ait değil' });
     }
     
     const result = examResultsRepo.upsertExamResult(input);
@@ -185,6 +247,7 @@ export const upsertExamResult: RequestHandler = (req, res) => {
 
 export const batchUpsertResults: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const { results } = req.body;
     
     if (!Array.isArray(results)) {
@@ -192,6 +255,28 @@ export const batchUpsertResults: RequestHandler = (req, res) => {
         success: false, 
         error: 'Sonuçlar array olmalıdır' 
       });
+    }
+    
+    const sessionIds = [...new Set(results.map(r => r.session_id))];
+    for (const sessionId of sessionIds) {
+      const session = examSessionsRepo.getExamSessionByIdAndSchool(sessionId, schoolId);
+      if (!session) {
+        return res.status(403).json({ 
+          success: false, 
+          error: `Oturum ${sessionId} seçili okula ait değil` 
+        });
+      }
+    }
+    
+    const studentIds = [...new Set(results.map(r => r.student_id))];
+    for (const studentId of studentIds) {
+      const student = studentsService.getStudentByIdAndSchool(studentId, schoolId);
+      if (!student) {
+        return res.status(403).json({ 
+          success: false, 
+          error: `Öğrenci ${studentId} seçili okula ait değil` 
+        });
+      }
     }
     
     const savedResults = examResultsRepo.batchUpsertExamResults(results);
@@ -208,8 +293,17 @@ export const batchUpsertResults: RequestHandler = (req, res) => {
 
 export const updateExamResult: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const { id } = req.params;
     const input = req.body;
+    
+    const existingResult = examResultsRepo.getExamResultById(id);
+    if (existingResult) {
+      const session = examSessionsRepo.getExamSessionByIdAndSchool(existingResult.session_id, schoolId);
+      if (!session) {
+        return res.status(403).json({ success: false, error: 'Bu sonuç seçili okula ait değil' });
+      }
+    }
     
     const result = examResultsRepo.updateExamResult(id, input);
     res.json({ success: true, data: result, message: 'Sonuç güncellendi' });
@@ -224,8 +318,9 @@ export const updateExamResult: RequestHandler = (req, res) => {
 
 export const deleteExamResult: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const { id } = req.params;
-    examResultsRepo.deleteExamResult(id);
+    examResultsRepo.deleteExamResult(id, schoolId);
     res.json({ success: true, message: 'Sonuç silindi' });
   } catch (error) {
     console.error('Error deleting exam result:', error);
@@ -235,7 +330,14 @@ export const deleteExamResult: RequestHandler = (req, res) => {
 
 export const getSessionStatistics: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const { sessionId } = req.params;
+    
+    const session = examSessionsRepo.getExamSessionByIdAndSchool(sessionId, schoolId);
+    if (!session) {
+      return res.status(403).json({ success: false, error: 'Bu oturum seçili okula ait değil' });
+    }
+    
     const stats = statisticsService.calculateExamSessionStatistics(sessionId);
     
     if (!stats) {
@@ -333,10 +435,15 @@ export const importExcelResults = [
 
 export const exportExcelResults: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const { sessionId } = req.params;
     
+    const session = examSessionsRepo.getExamSessionByIdAndSchool(sessionId, schoolId);
+    if (!session) {
+      return res.status(403).json({ success: false, error: 'Bu oturum seçili okula ait değil' });
+    }
+    
     const buffer = excelService.exportExamResultsToExcel(sessionId);
-    const session = examSessionsRepo.getExamSessionById(sessionId);
     const filename = `${session?.name || 'Sinav'}_Sonuclari.xlsx`;
     
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -407,7 +514,8 @@ export const deleteSchoolExam: RequestHandler = (req, res) => {
 
 export const getDashboardOverview: RequestHandler = (req, res) => {
   try {
-    const overview = dashboardService.getDashboardOverview();
+    const schoolId = getSchoolId(req);
+    const overview = dashboardService.getDashboardOverviewBySchool(schoolId);
     res.json({ success: true, data: overview });
   } catch (error) {
     console.error('Error fetching dashboard overview:', error);
@@ -417,6 +525,7 @@ export const getDashboardOverview: RequestHandler = (req, res) => {
 
 export const getSessionComparison: RequestHandler = (req, res) => {
   try {
+    const schoolId = getSchoolId(req);
     const { sessionIds, comparisonType } = req.body;
     
     if (!sessionIds || !Array.isArray(sessionIds) || sessionIds.length < 2) {
@@ -424,6 +533,16 @@ export const getSessionComparison: RequestHandler = (req, res) => {
         success: false, 
         error: 'En az 2 deneme seçilmelidir' 
       });
+    }
+    
+    for (const sessionId of sessionIds) {
+      const session = examSessionsRepo.getExamSessionByIdAndSchool(sessionId, schoolId);
+      if (!session) {
+        return res.status(403).json({ 
+          success: false, 
+          error: `Oturum ${sessionId} seçili okula ait değil` 
+        });
+      }
     }
     
     const comparison = comparisonService.compareExamSessions(
