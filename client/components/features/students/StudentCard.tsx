@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/organisms/Card';
 import { Badge } from '@/components/atoms/Badge';
 import { Button } from '@/components/atoms/Button';
 import { Checkbox } from '@/components/atoms/Checkbox';
-import { Eye, Pencil, Trash2, User, GraduationCap, AlertTriangle, ArrowRight, Heart, Target, BookOpen } from 'lucide-react';
+import { Eye, Pencil, Trash2, User, GraduationCap, AlertTriangle, ArrowRight, Heart, Target, BookOpen, Calendar } from 'lucide-react';
 import type { Student } from '@/lib/storage';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -171,6 +171,18 @@ export function StudentCard({
  >
  <Link to={`/ogrenci/${student.id}?tab=career`}>
  <Target className="h-3.5 w-3.5" />
+ </Link>
+ </Button>
+
+ <Button
+ asChild
+ size="sm"
+ className="flex-1 text-xs h-9 bg-blue-500 hover:bg-blue-600 text-white shadow-sm"
+ onClick={(e) => e.stopPropagation()}
+ title="Çalışma Programı"
+ >
+ <Link to={`/ogrenci/${student.id}?tab=academic&subtab=calisma-programi`}>
+ <Calendar className="h-3.5 w-3.5" />
  </Link>
  </Button>
 

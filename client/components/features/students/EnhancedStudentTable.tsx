@@ -16,7 +16,7 @@ import {
  DropdownMenuItem,
  DropdownMenuTrigger,
 } from '@/components/organisms/DropdownMenu';
-import { Eye, Pencil, Trash2, ArrowUpDown, ArrowUp, ArrowDown, MoreVertical, GraduationCap, Heart, Target, BookOpen } from 'lucide-react';
+import { Eye, Pencil, Trash2, ArrowUpDown, ArrowUp, ArrowDown, MoreVertical, GraduationCap, Heart, Target, BookOpen, Calendar } from 'lucide-react';
 import type { Student } from '@/lib/storage';
 import { Link } from 'react-router-dom';
 import type { ColumnVisibility } from './TableControls';
@@ -169,6 +169,18 @@ const StudentRow = memo(
  >
  <Link to={`/ogrenci/${student.id}?tab=demographics`}>
  <BookOpen className="h-4 w-4" />
+ </Link>
+ </Button>
+
+ <Button 
+ asChild 
+ size="sm" 
+ variant="ghost" 
+ className="h-8 w-8 p-0 text-blue-500 hover:text-blue-600"
+ title="Çalışma Programı"
+ >
+ <Link to={`/ogrenci/${student.id}?tab=academic&subtab=calisma-programi`}>
+ <Calendar className="h-4 w-4" />
  </Link>
  </Button>
  

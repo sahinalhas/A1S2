@@ -15,17 +15,21 @@ interface SmartAcademicDashboardProps {
  studentId: string;
  studentName?: string;
  onUpdate: () => void;
+ defaultSubtab?: string;
 }
 
 export default function SmartAcademicDashboard({
  studentId,
  studentName,
- onUpdate
+ onUpdate,
+ defaultSubtab
 }: SmartAcademicDashboardProps) {
+ const tabValue = defaultSubtab || "performans";
+ 
  return (
  <div className="space-y-6">
  {/* Akademik Alt Sekmeler */}
- <Tabs defaultValue="performans" className="space-y-4">
+ <Tabs defaultValue={tabValue} className="space-y-4">
  <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-white/80 backdrop-blur-sm border border-border/40 shadow-sm">
  {STUDENT_ACADEMIC_TABS.map((tabConfig) => {
  const Icon = tabConfig.icon;
