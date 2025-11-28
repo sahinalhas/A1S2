@@ -133,7 +133,7 @@ export class CareerRoadmapRepository {
       const stmt = this.db.prepare(`
         DELETE FROM career_roadmaps 
         WHERE id = ? AND studentId IN (
-          SELECT id FROM students WHERE school_id = ?
+          SELECT id FROM students WHERE schoolId = ?
         )
       `);
       stmt.run(id, schoolId);

@@ -99,7 +99,7 @@ export function getAllPendingSuggestions(limit: number = 100, schoolId?: string)
     WHERE status = 'PENDING'`;
   
   if (schoolId) {
-    query += ` AND studentId IN (SELECT id FROM students WHERE school_id = ?)`;
+    query += ` AND studentId IN (SELECT id FROM students WHERE schoolId = ?)`;
   }
   
   query += ` ORDER BY 
@@ -222,7 +222,7 @@ export function cleanupExpiredSuggestions(schoolId?: string): number {
     WHERE status = 'PENDING' AND expiresAt < datetime('now')`;
   
   if (schoolId) {
-    query += ` AND studentId IN (SELECT id FROM students WHERE school_id = ?)`;
+    query += ` AND studentId IN (SELECT id FROM students WHERE schoolId = ?)`;
   }
 
   const stmt = db.prepare(query);
@@ -234,7 +234,7 @@ export function cleanupExpiredSuggestions(schoolId?: string): number {
  * İstatistikler getir
  */
 export function getSuggestionStats(schoolId?: string): SuggestionStats {
-  const schoolFilter = schoolId ? ` AND studentId IN (SELECT id FROM students WHERE school_id = ?)` : '';
+  const schoolFilter = schoolId ? ` AND studentId IN (SELECT id FROM students WHERE schoolId = ?)` : '';
   
   const totalPending = db.prepare(
     `SELECT COUNT(*) as count FROM ai_suggestion_queue WHERE status = 'PENDING'${schoolFilter}`

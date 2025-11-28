@@ -1,6 +1,8 @@
 /**
  * Trend Analysis Repository
  * Trend Analizi Veri Erişim Katmanı
+ * 
+ * [SECURITY] Tüm sorgular schoolId ile filtrelenerek okul veri izolasyonu sağlanır
  */
 
 import { getDatabase } from '../../../lib/database/connection.js';
@@ -12,6 +14,10 @@ export function getTrendData(
   startDate?: string,
   endDate?: string
 ): TrendData[] {
+  if (!schoolId) {
+    throw new Error('[SECURITY] getTrendData requires schoolId for school isolation');
+  }
+
   const db = getDatabase();
   
   const start = startDate || getDefaultStartDate(period);
@@ -45,7 +51,7 @@ export function getTrendData(
         SUM(CASE WHEN sas.risk_level IN ('Yüksek', 'Kritik') THEN 1 ELSE 0 END) as riskStudents
       FROM student_analytics_snapshot sas
       INNER JOIN students s ON sas.student_id = s.id
-      WHERE DATE(sas.last_updated) BETWEEN ? AND ? AND s.school_id = ?
+      WHERE DATE(sas.last_updated) BETWEEN ? AND ? AND s.schoolId = ?
       GROUP BY ${groupBy}
     ),
     session_data AS (
@@ -62,7 +68,7 @@ export function getTrendData(
         COUNT(*) as behaviorIncidents
       FROM behavior_incidents bi
       INNER JOIN students s ON bi.studentId = s.id
-      WHERE DATE(bi.incidentDate) BETWEEN ? AND ? AND s.school_id = ?
+      WHERE DATE(bi.incidentDate) BETWEEN ? AND ? AND s.schoolId = ?
       GROUP BY ${groupBy.replace('created_at', 'incidentDate')}
     )
     SELECT 
@@ -88,6 +94,10 @@ export function analyzeTimeSeries(
   startDate?: string,
   endDate?: string
 ): TimeSeriesAnalysis {
+  if (!schoolId) {
+    throw new Error('[SECURITY] analyzeTimeSeries requires schoolId for school isolation');
+  }
+
   const trends = getTrendData(schoolId, period, startDate, endDate);
   
   if (trends.length === 0) {

@@ -1,15 +1,21 @@
 /**
  * Class Comparison Repository
  * Sınıf Karşılaştırma Veri Erişim Katmanı
+ * 
+ * [SECURITY] Tüm sorgular schoolId ile filtrelenerek okul veri izolasyonu sağlanır
  */
 
 import { getDatabase } from '../../../lib/database/connection.js';
 import type { ClassComparison, StudentBrief } from '../types/advanced-reports.types.js';
 
 export function getClassComparisons(schoolId: string, classNames?: string[]): ClassComparison[] {
+  if (!schoolId) {
+    throw new Error('[SECURITY] getClassComparisons requires schoolId for school isolation');
+  }
+
   const db = getDatabase();
   
-  let classFilter = 'WHERE s.school_id = ?';
+  let classFilter = 'WHERE s.schoolId = ?';
   if (classNames && classNames.length > 0) {
     const placeholders = classNames.map(() => '?').join(',');
     classFilter += ` AND s.class IN (${placeholders})`;
@@ -44,8 +50,8 @@ export function getClassComparisons(schoolId: string, classNames?: string[]): Cl
   return classStats.map(stat => {
     const className = stat.class;
     
-    const topPerformers = getTopPerformers(className, 5);
-    const atRiskStudents = getAtRiskStudents(className, 5);
+    const topPerformers = getTopPerformersBySchool(schoolId, className, 5);
+    const atRiskStudents = getAtRiskStudentsBySchool(schoolId, className, 5);
     const { strengths, challenges } = analyzeClassPerformance(stat);
     
     return {
@@ -69,7 +75,7 @@ export function getClassComparisons(schoolId: string, classNames?: string[]): Cl
   });
 }
 
-function getTopPerformers(className: string, limit: number): StudentBrief[] {
+function getTopPerformersBySchool(schoolId: string, className: string, limit: number): StudentBrief[] {
   const db = getDatabase();
   
   const performers = db.prepare(`
@@ -79,10 +85,10 @@ function getTopPerformers(className: string, limit: number): StudentBrief[] {
       sas.avg_exam_score as gpa
     FROM students s
     JOIN student_analytics_snapshot sas ON s.id = sas.student_id
-    WHERE s.class = ? AND sas.avg_exam_score IS NOT NULL
+    WHERE s.class = ? AND s.schoolId = ? AND sas.avg_exam_score IS NOT NULL
     ORDER BY sas.avg_exam_score DESC
     LIMIT ?
-  `).all(className, limit) as any[];
+  `).all(className, schoolId, limit) as any[];
   
   return performers.map(p => ({
     id: p.id,
@@ -92,7 +98,7 @@ function getTopPerformers(className: string, limit: number): StudentBrief[] {
   }));
 }
 
-function getAtRiskStudents(className: string, limit: number): StudentBrief[] {
+function getAtRiskStudentsBySchool(schoolId: string, className: string, limit: number): StudentBrief[] {
   const db = getDatabase();
   
   const atRisk = db.prepare(`
@@ -103,11 +109,11 @@ function getAtRiskStudents(className: string, limit: number): StudentBrief[] {
       sas.risk_score
     FROM students s
     JOIN student_analytics_snapshot sas ON s.id = sas.student_id
-    WHERE s.class = ? 
+    WHERE s.class = ? AND s.schoolId = ?
       AND sas.risk_level IN ('Yüksek', 'Kritik')
     ORDER BY sas.risk_score DESC
     LIMIT ?
-  `).all(className, limit) as any[];
+  `).all(className, schoolId, limit) as any[];
   
   return atRisk.map(r => ({
     id: r.id,
@@ -158,6 +164,10 @@ export function compareClasses(schoolId: string, className1: string, className2:
   class2: ClassComparison;
   insights: string[];
 } {
+  if (!schoolId) {
+    throw new Error('[SECURITY] compareClasses requires schoolId for school isolation');
+  }
+
   const comparisons = getClassComparisons(schoolId, [className1, className2]);
   
   if (comparisons.length < 2) {

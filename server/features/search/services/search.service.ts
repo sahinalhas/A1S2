@@ -117,7 +117,7 @@ export async function performGlobalSearchBySchool(query: string, schoolId: strin
   const students = db.prepare(`
     SELECT id, name || ' ' || surname as name, class
     FROM students
-    WHERE school_id = ?
+    WHERE schoolId = ?
       AND (LOWER(name) LIKE ? 
        OR LOWER(surname) LIKE ?
        OR LOWER(name || ' ' || surname) LIKE ?

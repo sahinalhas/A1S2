@@ -41,7 +41,7 @@ function ensureInitialized(): void {
     `),
     deleteAcademicGoal: db.prepare('DELETE FROM academic_goals WHERE id = ?'),
     deleteAcademicGoalBySchool: db.prepare(`
-      DELETE FROM academic_goals WHERE id = ? AND studentId IN (SELECT id FROM students WHERE school_id = ?)
+      DELETE FROM academic_goals WHERE id = ? AND studentId IN (SELECT id FROM students WHERE schoolId = ?)
     `),
   };
   
