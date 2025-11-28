@@ -126,11 +126,12 @@ export function getActiveAlerts() {
 }
 
 export function getActiveAlertsBySchool(schoolId: string) {
-  const studentRepo = require('../../students/repository/students.repository.js');
-  const students = studentRepo.loadStudentsBySchool(schoolId);
-  const studentIds = students.map((s: any) => s.id);
-  const allAlerts = repository.getActiveAlerts();
-  return allAlerts.filter((a: any) => studentIds.includes(a.studentId));
+  try {
+    return repository.getActiveAlertsBySchool(schoolId);
+  } catch (error) {
+    console.error('Error getting active alerts by school:', error);
+    return [];
+  }
 }
 
 export function getAlertById(id: string) {
@@ -188,18 +189,31 @@ export function getAlertStatistics() {
 }
 
 export function getDashboardSummary() {
-  const activeAlerts = repository.getActiveAlerts();
-  const highRiskStudents = repository.getHighRiskStudents();
-  const activeRecommendations = repository.getActiveRecommendations();
-  const alertStats = repository.getAlertStatistics();
-  
-  return {
-    totalActiveAlerts: activeAlerts.length,
-    highRiskStudentCount: highRiskStudents.length,
-    pendingRecommendations: activeRecommendations.filter(r => r.status === 'ÖNERİLDİ').length,
-    criticalAlerts: activeAlerts.filter(a => a.alertLevel === 'KRİTİK').length,
-    alertsByLevel: alertStats,
-    recentAlerts: activeAlerts.slice(0, 5),
-    topRiskStudents: highRiskStudents.slice(0, 10)
-  };
+  try {
+    const activeAlerts = repository.getActiveAlerts();
+    const highRiskStudents = repository.getHighRiskStudents();
+    const activeRecommendations = repository.getActiveRecommendations();
+    const alertStats = repository.getAlertStatistics();
+    
+    return {
+      totalActiveAlerts: activeAlerts.length,
+      highRiskStudentCount: highRiskStudents.length,
+      pendingRecommendations: activeRecommendations.filter(r => r.status === 'ÖNERİLDİ').length,
+      criticalAlerts: activeAlerts.filter(a => a.alertLevel === 'KRİTİK').length,
+      alertsByLevel: alertStats,
+      recentAlerts: activeAlerts.slice(0, 5),
+      topRiskStudents: highRiskStudents.slice(0, 10)
+    };
+  } catch (error) {
+    console.error('Error getting dashboard summary:', error);
+    return {
+      totalActiveAlerts: 0,
+      highRiskStudentCount: 0,
+      pendingRecommendations: 0,
+      criticalAlerts: 0,
+      alertsByLevel: [],
+      recentAlerts: [],
+      topRiskStudents: []
+    };
+  }
 }

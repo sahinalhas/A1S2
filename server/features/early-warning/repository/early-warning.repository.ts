@@ -186,7 +186,25 @@ export function getActiveAlerts(): EarlyWarningAlert[] {
     return statements.getActiveAlerts.all() as EarlyWarningAlert[];
   } catch (error) {
     console.error('Database error in getActiveAlerts:', error);
-    throw error;
+    // Return empty array on error to avoid dashboard crashes
+    return [];
+  }
+}
+
+export function getActiveAlertsBySchool(schoolId: string): EarlyWarningAlert[] {
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    const stmt = db.prepare(`
+      SELECT ewa.* FROM early_warning_alerts ewa
+      JOIN students s ON ewa.studentId = s.id
+      WHERE s.school_id = ? AND ewa.status IN ('AÇIK', 'İNCELENİYOR')
+      ORDER BY ewa.alertLevel DESC, ewa.created_at DESC
+    `);
+    return stmt.all(schoolId) as EarlyWarningAlert[];
+  } catch (error) {
+    console.error('Database error in getActiveAlertsBySchool:', error);
+    return [];
   }
 }
 
