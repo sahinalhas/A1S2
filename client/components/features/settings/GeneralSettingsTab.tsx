@@ -49,7 +49,6 @@ export default function GeneralSettingsTab() {
    settings.weekStart !== savedSettings.weekStart ||
    settings.account.displayName !== savedSettings.account.displayName ||
    settings.account.email !== savedSettings.account.email ||
-   settings.account.institution !== savedSettings.account.institution ||
    settings.account.signature !== savedSettings.account.signature
  );
 
@@ -249,17 +248,6 @@ export default function GeneralSettingsTab() {
                onChange={(e) => setSettings({
                  ...settings,
                  account: { ...settings.account, email: e.target.value }
-               })}
-             />
-           </div>
-           <div className="grid gap-2">
-             <Label htmlFor="institution">Kurum</Label>
-             <Input
-               id="institution"
-               value={settings.account.institution}
-               onChange={(e) => setSettings({
-                 ...settings,
-                 account: { ...settings.account, institution: e.target.value }
                })}
              />
            </div>

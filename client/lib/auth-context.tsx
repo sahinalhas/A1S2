@@ -27,7 +27,6 @@ export interface User {
   email: string;
   role: UserRole;
   permissions: string[];
-  institution: string;
 }
 
 export interface AuthContextType {
