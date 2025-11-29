@@ -96,8 +96,20 @@ export default function Courses() {
 
  const handleReset = async () => {
  try {
- const { resetSubjectsAndTopics } = await import('@/lib/storage');
- await resetSubjectsAndTopics();
+ const response = await fetch('/api/subjects/reset', {
+ method: 'POST',
+ credentials: 'include',
+ headers: {
+ 'Content-Type': 'application/json',
+ },
+ });
+
+ const data = await response.json();
+
+ if (!response.ok || !data.success) {
+ throw new Error(data.error || 'Sıfırlama başarısız oldu');
+ }
+
  await refreshData();
  toast({
  title: 'Başarılı',
