@@ -68,18 +68,30 @@ export default function Courses() {
  new Set()
  );
  const [resetDialogOpen, setResetDialogOpen] = useState(false);
+ const [loadError, setLoadError] = useState<string | null>(null);
 
  useEffect(() => {
  refreshData();
  }, []);
 
  async function refreshData() {
+ try {
+ setLoadError(null);
  const [subjectsData, topicsData] = await Promise.all([
  loadSubjectsAsync(),
  loadTopicsAsync(),
  ]);
  setSubjects(subjectsData);
  setTopics(topicsData);
+ } catch (error) {
+ const errorMsg = error instanceof Error ? error.message : 'Veriler yüklenirken bir hata oluştu';
+ setLoadError(errorMsg);
+ toast({
+ title: 'Hata',
+ description: errorMsg,
+ variant: 'destructive',
+ });
+ }
  }
 
  const handleReset = async () => {
@@ -130,6 +142,25 @@ export default function Courses() {
  };
 
  const selectedCategoryData = CATEGORIES.find(c => c.id === selectedCategory);
+
+ if (loadError) {
+ return (
+ <div className="w-full max-w-7xl mx-auto py-8 px-4">
+ <div className="bg-destructive/10 border border-destructive text-destructive p-4 rounded-lg">
+ <p className="font-semibold">Hata</p>
+ <p className="text-sm mt-1">{loadError}</p>
+ <Button 
+ variant="outline" 
+ size="sm" 
+ onClick={() => refreshData()}
+ className="mt-3"
+ >
+ Yeniden Yükle
+ </Button>
+ </div>
+ </div>
+ );
+ }
 
  return (
  <div className="w-full max-w-7xl mx-auto py-8 px-4 space-y-8">
