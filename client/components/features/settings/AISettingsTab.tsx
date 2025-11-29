@@ -11,6 +11,7 @@ import { Input } from '@/components/atoms/Input';
 import { Button } from '@/components/atoms/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/atoms/Select';
 import { Switch } from '@/components/atoms/Switch';
+import { fetchWithSchool } from '@/lib/api/core/fetch-helpers';
 import { 
   Brain, 
   CheckCircle, 

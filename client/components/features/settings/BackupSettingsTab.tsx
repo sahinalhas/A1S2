@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { fetchWithSchool } from '@/lib/api/core/fetch-helpers';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchWithSchool } from '@/lib/api/core/fetch-helpers';
 import { useAuth } from '@/lib/auth-context';
 import { UseFormReturn } from 'react-hook-form';
 import { AppSettings } from '@/lib/app-settings';
