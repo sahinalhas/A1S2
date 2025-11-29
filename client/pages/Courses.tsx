@@ -786,7 +786,7 @@ function TopicRow({
  ? new Date(topic.deadline).toLocaleDateString("tr-TR", { day: '2-digit', month: '2-digit' })
  :"-"}
  </div>
- <div className="col-span-1 flex items-center justify-end gap-0.5 opacity-0 group-">
+ <div className="col-span-1 flex items-center justify-end gap-0.5 opacity-0 group-hover:opacity-100">
  <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="h-7 w-7 p-0">
  <Pencil className="h-3.5 w-3.5" />
  </Button>
