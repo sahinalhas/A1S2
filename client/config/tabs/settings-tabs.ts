@@ -1,4 +1,4 @@
-import { Globe, Bell, Sparkles, BookOpen, Shield, Archive, Target, Building2 } from "lucide-react";
+import { Globe, Bell, Sparkles, Shield, Archive, Building2 } from "lucide-react";
 import { TabConfig } from "./types";
 
 /**
@@ -30,12 +30,6 @@ export const SETTINGS_TABS: TabConfig[] = [
  description:"Yapay zeka entegrasyonu ve ayarları"
  },
  {
- value:"dersler",
- label:"Dersler & Konular",
- icon: BookOpen,
- description:"Ders ve konu yönetimi"
- },
- {
  value:"guvenlik",
  label:"Güvenlik",
  icon: Shield,
@@ -46,11 +40,5 @@ export const SETTINGS_TABS: TabConfig[] = [
  label:"Yedekleme",
  icon: Archive,
  description:"Veri yedekleme ve geri yükleme"
- },
- {
- value:"rehberlik-standartlari",
- label:"Rehberlik Standartları",
- icon: Target,
- description:"Rehberlik standartları ve hedefler"
  }
 ];

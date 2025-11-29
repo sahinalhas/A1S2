@@ -186,10 +186,6 @@ export default function SettingsPage() {
                <AISettingsTab />
              </TabsContent>
 
-             <TabsContent value="dersler">
-               <CoursesSettingsTab />
-             </TabsContent>
-
              <TabsContent value="guvenlik">
                <SecuritySettingsTab
                  onReset={onReset}
@@ -201,9 +197,6 @@ export default function SettingsPage() {
                <BackupSettingsTab />
              </TabsContent>
 
-             <TabsContent value="rehberlik-standartlari">
-               <GuidanceStandardsTab />
-             </TabsContent>
            </Tabs>
          </motion.div>
        </div>

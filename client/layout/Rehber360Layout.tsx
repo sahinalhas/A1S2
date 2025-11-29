@@ -46,6 +46,7 @@ import {
  PanelLeftClose,
  PanelLeftOpen,
  Lightbulb,
+ BookOpen,
 } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { loadSettings, updateSettings, SETTINGS_KEY, AppSettings } from "@/lib/app-settings";
@@ -130,6 +131,7 @@ const navigationItems = [
  { label:"Raporlama", icon: FileText, to:"/raporlar" },
  { label:"Sınavlar", icon: ClipboardList, to:"/olcme-degerlendirme" },
  { label:"Anketler", icon: MessageSquare, to:"/anketler" },
+ { label:"İçerik Yönetimi", icon: BookOpen, to:"/icerik-yonetimi" },
  { label:"Ayarlar", icon: Settings, to:"/ayarlar" },
 ];
 

@@ -26,6 +26,7 @@ const NotFound = lazy(() => import("@/pages/NotFound"));
 const AIToolsPage = lazy(() => import("@/pages/AIToolsPage"));
 const AdvancedStudentAnalysis = lazy(() => import("@/pages/AdvancedStudentAnalysis"));
 const Notifications = lazy(() => import("@/pages/Notifications"));
+const ContentManagement = lazy(() => import("@/pages/ContentManagement"));
 const InterventionTracking = lazy(() => import("@/pages/InterventionTracking"));
 const ParentAccess = lazy(() => import("@/pages/ParentAccess"));
 const SchoolDashboard = lazy(() => import("@/pages/SchoolDashboard"));
@@ -96,6 +97,10 @@ const App = () => {
  element={<Suspense fallback={<LoadingFallback />}><ExamManagementPage /></Suspense>}
  />
  <Route path="/ayarlar" element={<Suspense fallback={<LoadingFallback />}><SettingsPage /></Suspense>} />
+ <Route
+ path="/icerik-yonetimi"
+ element={<Suspense fallback={<LoadingFallback />}><ContentManagement /></Suspense>}
+ />
  <Route
  path="/ai-araclari"
  element={<Suspense fallback={<LoadingFallback />}><AIToolsPage /></Suspense>}
