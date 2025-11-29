@@ -48,6 +48,7 @@ import {
  updateTopic,
  removeTopic,
 } from "@/lib/storage";
+import { apiClient } from "@/lib/api/core/client";
 
 type Category ="LGS" |"TYT" |"AYT" |"YDT" |"School";
 
@@ -96,19 +97,9 @@ export default function Courses() {
 
  const handleReset = async () => {
  try {
- const response = await fetch('/api/subjects/reset', {
- method: 'POST',
- credentials: 'include',
- headers: {
- 'Content-Type': 'application/json',
- },
+ await apiClient.post<{ success: boolean; message?: string; error?: string }>('/api/subjects/reset', {}, {
+ showErrorToast: false,
  });
-
- const data = await response.json();
-
- if (!response.ok || !data.success) {
- throw new Error(data.error || 'Sıfırlama başarısız oldu');
- }
 
  await refreshData();
  toast({
