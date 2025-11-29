@@ -48,6 +48,7 @@ import { useSettings } from "@/hooks/queries/settings.query-hooks";
 import { apiClient } from "@/lib/api/core/client";
 import type { Student } from "@/lib/types/student.types";
 import { useAuth } from "@/lib/auth-context";
+import type { School } from "@/lib/auth-context";
 
 interface EnhancedCompleteSessionDialogProps {
  open: boolean;
@@ -73,7 +74,7 @@ export default function EnhancedCompleteSessionDialog({
  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
  const { toast } = useToast();
  const { data: settings } = useSettings();
- const { user } = useAuth();
+ const { user, selectedSchool } = useAuth();
 
  const { analyzeSession, analysis, isAnalyzing, clearAnalysis } = useAISessionAnalysis();
 
@@ -144,7 +145,7 @@ export default function EnhancedCompleteSessionDialog({
  const formValues = form.getValues();
  const topic = topics.find(t => t.id === formValues.topic);
  const topicFullPath = topic?.fullPath;
- const schoolName = settings?.account?.institution;
+ const schoolName = selectedSchool?.name;
  
  // Prepare student data for PDF
  const studentData = fullStudentData ? {

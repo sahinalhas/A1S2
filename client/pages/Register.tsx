@@ -18,8 +18,7 @@ export default function Register() {
  email: '',
  password: '',
  confirmPassword: '',
- role: 'counselor' as 'counselor' | 'teacher' | 'student' | 'parent',
- institution: ''
+ role: 'counselor' as 'counselor' | 'teacher' | 'student' | 'parent'
  });
  const [showPassword, setShowPassword] = useState(false);
  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -55,12 +54,6 @@ export default function Register() {
  errors.confirmPassword = 'Şifreler eşleşmiyor';
  }
 
- if (!formData.institution.trim()) {
- errors.institution = 'Kurum adı gereklidir';
- } else if (formData.institution.trim().length < 3) {
- errors.institution = 'Kurum adı en az 3 karakter olmalıdır';
- }
-
  setValidationErrors(errors);
  return Object.keys(errors).length === 0;
  };
@@ -83,8 +76,7 @@ export default function Register() {
  name: formData.name.trim(),
  email: formData.email.trim().toLowerCase(),
  password: formData.password,
- role: formData.role,
- institution: formData.institution.trim()
+ role: formData.role
  },
  {
  showErrorToast: false, // We'll handle errors manually
@@ -313,24 +305,6 @@ export default function Register() {
  <p className="text-sm text-destructive">{validationErrors.confirmPassword}</p>
  )}
  </div>
- </div>
-
- <div className="space-y-2">
- <Label htmlFor="institution">
- Kurum Adı <span className="text-destructive">*</span>
- </Label>
- <Input
- id="institution"
- type="text"
- placeholder="Örnek İlkokulu"
- value={formData.institution}
- onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
- disabled={isLoading}
- className={validationErrors.institution ? 'border-destructive' : ''}
- />
- {validationErrors.institution && (
- <p className="text-sm text-destructive">{validationErrors.institution}</p>
- )}
  </div>
 
  <div className="space-y-2">

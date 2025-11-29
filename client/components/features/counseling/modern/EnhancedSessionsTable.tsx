@@ -45,7 +45,7 @@ export default function EnhancedSessionsTable({
 }: EnhancedSessionsTableProps) {
   const { toast } = useToast();
   const { data: settings } = useSettings();
-  const { user } = useAuth();
+  const { user, selectedSchool } = useAuth();
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [columns, setColumns] = useState<Column[]>([
@@ -307,7 +307,7 @@ export default function EnhancedSessionsTable({
                     const topic = topicsMap.get(session.topic || '');
                     const topicFullPath = topic?.fullPath;
                     const topicTitle = topic?.title;
-                    const schoolName = settings?.account?.institution;
+                    const schoolName = selectedSchool?.name;
                     
                     const studentData = session.student ? {
                       gender: (session.student as any)?.gender || '-',

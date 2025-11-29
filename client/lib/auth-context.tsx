@@ -182,7 +182,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setNeedsSchoolSelection(true);
             } else if (schools.length > 1) {
               // Look for default school first
-              const defaultSchool = schools.find(s => s.isDefault === 1 || s.isDefault === true);
+              const defaultSchool = schools.find(s => s.isDefault === 1);
               if (defaultSchool) {
                 selectSchool(defaultSchool, true);
               } else {
@@ -249,7 +249,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setNeedsSchoolSelection(true);
         } else if (schools.length > 1) {
           // Look for default school first
-          const defaultSchool = schools.find(s => s.isDefault === 1 || s.isDefault === true);
+          const defaultSchool = schools.find(s => s.isDefault === 1);
           if (defaultSchool) {
             selectSchool(defaultSchool, true);
           } else {
