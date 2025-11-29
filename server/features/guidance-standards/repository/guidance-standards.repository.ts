@@ -24,7 +24,6 @@ function ensureInitialized(): void {
     `),
     updateCategory: db.prepare('UPDATE guidance_categories SET title = ?, updated_at = datetime(\'now\') WHERE id = ?'),
     deleteCategory: db.prepare('DELETE FROM guidance_categories WHERE id = ?'),
-    deleteCategoryBySchool: db.prepare('DELETE FROM guidance_categories WHERE id = ? AND school_id = ?'),
     
     getAllItems: db.prepare('SELECT * FROM guidance_items ORDER BY "order" ASC'),
     getItemById: db.prepare('SELECT * FROM guidance_items WHERE id = ?'),
@@ -36,7 +35,6 @@ function ensureInitialized(): void {
     `),
     updateItem: db.prepare('UPDATE guidance_items SET title = ?, updated_at = datetime(\'now\') WHERE id = ?'),
     deleteItem: db.prepare('DELETE FROM guidance_items WHERE id = ?'),
-    deleteItemBySchool: db.prepare('DELETE FROM guidance_items WHERE id = ? AND school_id = ?'),
     reorderItem: db.prepare('UPDATE guidance_items SET "order" = ? WHERE id = ?'),
     
     deleteAllCategories: db.prepare('DELETE FROM guidance_categories'),
