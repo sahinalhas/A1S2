@@ -96,25 +96,17 @@ export default function Courses() {
 
  const handleReset = async () => {
  try {
- const response = await fetch('/api/subjects/reset', {
- method: 'POST',
- });
-
- const data = await response.json();
-
- if (data.success) {
+ const { resetSubjectsAndTopics } = await import('@/lib/storage');
+ await resetSubjectsAndTopics();
  await refreshData();
  toast({
  title: 'Başarılı',
  description: 'Dersler ve konular varsayılan değerlere sıfırlandı',
  });
- } else {
- throw new Error(data.error);
- }
  } catch (error) {
  toast({
  title: 'Hata',
- description: 'Sıfırlama sırasında bir hata oluştu',
+ description: error instanceof Error ? error.message : 'Sıfırlama sırasında bir hata oluştu',
  variant: 'destructive',
  });
  } finally {
