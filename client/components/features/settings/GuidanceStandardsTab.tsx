@@ -6,6 +6,7 @@ import { Button } from '@/components/atoms/Button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/organisms/Tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/organisms/Card';
 import { useToast } from '@/hooks/utils/toast.utils';
+import { fetchWithSchool } from '@/lib/api/core/fetch-helpers';
 import {
  AlertDialog,
  AlertDialogAction,
@@ -61,7 +62,7 @@ export default function GuidanceStandardsTab() {
  const loadStandards = async () => {
  try {
  setLoading(true);
- const response = await fetch('/api/guidance-standards');
+ const response = await fetchWithSchool('/api/guidance-standards');
  const data = await response.json();
  
  if (data.success) {
@@ -94,7 +95,7 @@ export default function GuidanceStandardsTab() {
  if (!newItemTitle.trim()) return;
 
  try {
- const response = await fetch('/api/guidance-standards/item', {
+ const response = await fetchWithSchool('/api/guidance-standards/item', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
@@ -134,7 +135,7 @@ export default function GuidanceStandardsTab() {
  if (!editingValue.trim()) return;
 
  try {
- const response = await fetch(`/api/guidance-standards/item/${itemId}`, {
+ const response = await fetchWithSchool(`/api/guidance-standards/item/${itemId}`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ title: editingValue.trim() }),
@@ -171,7 +172,7 @@ export default function GuidanceStandardsTab() {
  if (!itemToDelete) return;
 
  try {
- const response = await fetch(`/api/guidance-standards/item/${itemToDelete.id}`, {
+ const response = await fetchWithSchool(`/api/guidance-standards/item/${itemToDelete.id}`, {
  method: 'DELETE',
  });
 
@@ -200,7 +201,7 @@ export default function GuidanceStandardsTab() {
 
  const handleExport = async () => {
  try {
- const response = await fetch('/api/guidance-standards/export');
+ const response = await fetchWithSchool('/api/guidance-standards/export');
  const data = await response.json();
  
  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -232,7 +233,7 @@ export default function GuidanceStandardsTab() {
  const text = await file.text();
  const data = JSON.parse(text);
 
- const response = await fetch('/api/guidance-standards/import', {
+ const response = await fetchWithSchool('/api/guidance-standards/import', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify(data),
@@ -262,7 +263,7 @@ export default function GuidanceStandardsTab() {
 
  const handleReset = async () => {
  try {
- const response = await fetch('/api/guidance-standards/reset', {
+ const response = await fetchWithSchool('/api/guidance-standards/reset', {
  method: 'POST',
  });
 
