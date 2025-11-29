@@ -17,10 +17,8 @@ import GeneralSettingsTab from "@/components/features/settings/GeneralSettingsTa
 import SchoolSettingsTab from "@/components/features/settings/SchoolSettingsTab";
 import NotificationsSettingsTab from "@/components/features/settings/NotificationsSettingsTab";
 import AISettingsTab from "@/components/features/settings/AISettingsTab";
-import CoursesSettingsTab from "@/components/features/settings/CoursesSettingsTab";
 import SecuritySettingsTab from "@/components/features/settings/SecuritySettingsTab";
 import BackupSettingsTab from "@/components/features/settings/BackupSettingsTab";
-import GuidanceStandardsTab from "@/components/features/settings/GuidanceStandardsTab";
 
 // Settings Tab Dirty Context - centralized save management
 export const SettingsTabDirtyContext = createContext<{
@@ -42,10 +40,8 @@ export default function SettingsPage() {
      "okullar",
      "bildirim",
      "ai",
-     "dersler",
      "guvenlik",
      "yedekleme",
-     "rehberlik-standartlari",
    ]);
    return allowed.has(t) ? t : "genel";
  }, [searchParams]);
