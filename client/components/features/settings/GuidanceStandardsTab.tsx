@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useSettingsTabDirty } from '@/pages/Settings';
 import { motion } from 'framer-motion';
 import { ChevronRight, ChevronDown, Plus, Edit2, Trash2, Check, X, Download, Upload, RotateCcw, Loader2, BookOpen, Users, User } from 'lucide-react';
 import { Button } from '@/components/atoms/Button';
@@ -18,10 +17,20 @@ import {
  AlertDialogTitle,
 } from '@/components/organisms/AlertDialog';
 import type { GuidanceCategory, GuidanceItem, GuidanceStandard } from '../../../../shared/types/index.js';
+import { useSettingsTabDirty } from '@/pages/Settings';
+
+// Hook wrapper that safely handles missing context
+const useSettingsContext = () => {
+ try {
+ return useSettingsTabDirty();
+ } catch {
+ return null;
+ }
+};
 
 export default function GuidanceStandardsTab() {
  const { toast } = useToast();
- const settingsContext = useSettingsTabDirty();
+ const settingsContext = useSettingsContext();
  const componentId = useMemo(() => `guidance-standards-${Date.now()}`, []);
 
  const [activeTab, setActiveTab] = useState<'individual' | 'group'>('individual');
@@ -40,9 +49,10 @@ export default function GuidanceStandardsTab() {
  loadStandards();
  }, []);
 
- // Register save handler with parent context
+ // Register save handler with parent context (if available)
  // GuidanceStandardsTab items are saved immediately on add/edit/delete
- // So this just confirms that there are no pending operations
+ // When used in Settings.tsx, this provides context for form submission
+ // When used standalone (ContentManagement), this is optional
  useEffect(() => {
  if (!settingsContext?.registerTabSubmit) return;
  
